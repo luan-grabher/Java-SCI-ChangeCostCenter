@@ -22,6 +22,16 @@ public class ContabilityEntry {
 
     private boolean conciliateDebit = false;
     private boolean conciliateCredit = false;
+    
+    private Integer entryType = 0;
+
+    public Integer getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(Integer entryType) {
+        this.entryType = entryType;
+    }    
 
     public Integer getKey() {
         return key;
@@ -142,8 +152,6 @@ public class ContabilityEntry {
     public void setConciliateCredit(boolean conciliateCredit) {
         this.conciliateCredit = conciliateCredit;
     }
-
-    
     
     public boolean isConciliate(){
         return conciliateCredit || conciliateDebit;
