@@ -25,6 +25,6 @@ VALUES (
     1, --tipo lanc
     ':document', -- NF/DOCTO
     32, -- usuario
-    null, -- participante debito - na contabilidade geralmente é debito
-    null --part credit
+    :participantDebit, -- participante debito
+    :participantCredit --part credit
 );

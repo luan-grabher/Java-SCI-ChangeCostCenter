@@ -11,17 +11,17 @@ public class ContabilityEntry {
 
     private Calendar date = Calendar.getInstance();
     private Integer defaultPlan = 0;
-    private Integer accountDebit = 0;
-    private Integer accountCredit = 0;
-    private Integer participantCredit = 0;
-    private Integer participantDebit = 0;
-    private Integer descriptionCode = 0;
+    private Integer accountDebit = null;
+    private Integer accountCredit = null;
+    private Integer participantCredit = null;
+    private Integer participantDebit = null;
+    private Integer descriptionCode = null;
     private String descriptionComplement = "";
     private String document = "";
     private BigDecimal value = BigDecimal.ZERO;
 
-    private boolean conciliateDebit;
-    private boolean conciliateCredit;
+    private boolean conciliateDebit = false;
+    private boolean conciliateCredit = false;
 
     public Integer getKey() {
         return key;

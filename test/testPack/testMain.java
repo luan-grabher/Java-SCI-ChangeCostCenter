@@ -4,9 +4,12 @@ public class testMain {
 
 
     public static void main(String[] args) {
-        boolean b = true;
+        String s = " replace this :rep";
+        Integer n = null;
         
-        System.out.println("resultado: " + b);
+        s = s.replaceFirst(":rep", n + "");
+        
+        System.out.println(s);
     }
     
 }
