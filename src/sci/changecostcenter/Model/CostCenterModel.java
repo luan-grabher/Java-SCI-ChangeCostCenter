@@ -2,6 +2,8 @@ package sci.changecostcenter.Model;
 
 import Dates.Dates;
 import SimpleDotEnv.Env;
+import SimpleView.Loading;
+import fileManager.FileManager;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -103,6 +105,15 @@ public class CostCenterModel {
     public void setNewEntries(List<ContabilityEntry> newEntries) {
         this.newEntries = newEntries;
     }
-    
-    
+        
+    public void reverseEntriesOnDatabase(){        
+        //Cria carregamento
+        Loading loading = new Loading("Estornando lançamentos no banco", 0, reverseEntries.size());
+        
+        String scriptSql = FileManager.getText(new File("\\sql\\"));
+        
+        for (ContabilityEntry reverseEntry : reverseEntries) {
+            
+        }
+    }
 }
