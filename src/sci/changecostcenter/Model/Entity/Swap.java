@@ -12,10 +12,11 @@ public class Swap {
     private Integer participantCredit = null;
     private Integer participantDebit = null;
     private Integer descriptionCode = null;
-    private FiltroString filters;
+    private FiltroString filter;
 
     private List<ContabilityEntry> entries = new ArrayList<>();
-    private Integer costCenter = null;
+    private Integer costCenterCredit = null;
+    private Integer costCenterDebit = null;
 
     public Swap() {
     }
@@ -60,20 +61,28 @@ public class Swap {
         this.descriptionCode = descriptionCode;
     }
 
-    public Integer getCostCenter() {
-        return costCenter;
+    public Integer getCostCenterCredit() {
+        return costCenterCredit;
     }
 
-    public void setCostCenter(Integer costCenter) {
-        this.costCenter = costCenter;
+    public void setCostCenterCredit(Integer costCenterCredit) {
+        this.costCenterCredit = costCenterCredit;
     }
 
-    public FiltroString getFilters() {
-        return filters;
+    public Integer getCostCenterDebit() {
+        return costCenterDebit;
     }
 
-    public void setFilters(FiltroString filters) {
-        this.filters = filters;
+    public void setCostCenterDebit(Integer costCenterDebit) {
+        this.costCenterDebit = costCenterDebit;
+    }    
+
+    public FiltroString getFilter() {
+        return filter;
+    }
+
+    public void setFilter(FiltroString filter) {
+        this.filter = filter;
     }
 
     public List<ContabilityEntry> getEntries() {

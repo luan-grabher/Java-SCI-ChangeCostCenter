@@ -1,15 +1,15 @@
 package testPack;
 
+import java.util.Objects;
+
 public class testMain {
 
 
     public static void main(String[] args) {
-        String s = " replace this :rep";
-        Integer n = null;
+        String s = "sssss";
+        String n = "sssss";       
         
-        s = s.replaceFirst(":rep", n + "");
-        
-        System.out.println(s);
+        System.out.println(Objects.equals(n,s));
     }
     
 }

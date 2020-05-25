@@ -23,6 +23,9 @@ public class ContabilityEntry {
     private boolean conciliateDebit = false;
     private boolean conciliateCredit = false;
     
+    private Integer costCenterCredit = null;
+    private Integer costCenterDebit = null;
+    
     private Integer entryType = 0;
 
     public Integer getEntryType() {
