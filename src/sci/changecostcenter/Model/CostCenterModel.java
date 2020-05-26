@@ -111,46 +111,93 @@ public class CostCenterModel {
         //Cria carregamento
         Loading loading = new Loading("Estornando lançamentos no banco", 0, reverseEntries.size());
         Integer count = 0;
-        
+
         for (ContabilityEntry reverseEntry : reverseEntries) {
             //Atualiza carregamento
             count++;
-            loading.update(count);
-            
+            loading.updateBar(count);
+
             Integer accountCredit = reverseEntry.getAccountCredit();
             Integer accountDebit = reverseEntry.getAccountDebit();
             Integer participantCredit = reverseEntry.getParticipantCredit();
             Integer participantDebit = reverseEntry.getParticipantDebit();
-            
+
             reverseEntry.setAccountCredit(accountDebit);
             reverseEntry.setAccountDebit(accountCredit);
             reverseEntry.setParticipantCredit(participantDebit);
             reverseEntry.setParticipantDebit(participantCredit);
-            
+
             insertContabilityEntryOnDatabase(reverseEntry);
+        }
+    }
+
+    public void insertNewEntriesOnDatabase() {
+        //Cria carregamento
+        Loading loading = new Loading("Inserindo novos lançamentos no banco", 0, newEntries.size());
+        Integer count = 0;
+
+        for (ContabilityEntry newEntry : newEntries) {
+            count++;
+            loading.updateBar(count);
+
+            insertContabilityEntryOnDatabase(newEntry);
+            insertContabilityEntryCostCenter(newEntry);
         }
     }
 
     private String scriptSqlInsertContabilityEntry = "";
 
     public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
-        if(scriptSqlInsertContabilityEntry.isBlank()){
+        if (scriptSqlInsertContabilityEntry.isBlank()) {
             scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
         }
-        
+
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
 
         variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
-        variableChanges.put("accountDebit", entry.getAccountDebit()+ ""); //reverse account to reverse values on database
+        variableChanges.put("accountDebit", entry.getAccountDebit() + ""); //reverse account to reverse values on database
         variableChanges.put("accountCredit", entry.getAccountCredit() + ""); //reverse account to reverse values on database
         variableChanges.put("date", new SimpleDateFormat("yyyy-mm-dd", Dates.BRAZIL).format(entry.getDate().getTime()));
         variableChanges.put("value", entry.getValue().toString());
         variableChanges.put("descriptionComplement", entry.getDescriptionComplement());
         variableChanges.put("document", entry.getDocument());
-        variableChanges.put("participantDebit", entry.getParticipantDebit()+ "");
+        variableChanges.put("participantDebit", entry.getParticipantDebit() + "");
         variableChanges.put("participantCredit", entry.getParticipantCredit() + "");
 
         Database.getDatabase().query(scriptSqlInsertContabilityEntry, variableChanges);
+    }
+
+    private String scriptSqlInsertContabilityEntryCostCenter = "";
+
+    public void insertContabilityEntryCostCenter(ContabilityEntry entry) {
+        if (scriptSqlInsertContabilityEntryCostCenter.isBlank()) {
+            scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
+        }
+
+        //Cria variavel de trocas
+        Map<String, String> variableChanges = new HashMap<>();
+
+        variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
+        variableChanges.put("key", "chave"); //reverse account to reverse values on database
+        variableChanges.put("centerCostPlan", Env.get("centerCostPlan")); //reverse account to reverse values on database
+        variableChanges.put("value", entry.getValue().toString());
+        variableChanges.put("valueType", null);
+        variableChanges.put("centerCost", null);
+
+        if (entry.getCostCenterCredit() != null) {
+            variableChanges.replace("valueType", "1");
+            variableChanges.replace("centerCost", entry.getCostCenterCredit() + "");
+
+            Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
+        }
+        
+        if (entry.getCostCenterDebit()!= null) {
+            variableChanges.replace("valueType", "0");
+            variableChanges.replace("centerCost", entry.getCostCenterDebit() + "");
+
+            Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
+        }
+
     }
 }

@@ -77,6 +77,18 @@ public class Controller {
         @Override
         public void run() {
             costCenterModel.reverseEntriesOnDatabase();
+        }        
+    }
+    
+    public class insertNewEntriesOnDatabase extends Executavel{
+
+        public insertNewEntriesOnDatabase() {
+            nome = "Inserindo novos lançamentos no banco de dados...";
+        }
+
+        @Override
+        public void run() {
+            costCenterModel.insertNewEntriesOnDatabase();
         }
         
     }
