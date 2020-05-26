@@ -19,7 +19,7 @@ VALUES (
     (select BDCODPLAPADRAO from VWGR_SCI_EMPRESAS where BDCODEMP = :enterpriseCode), --plano padrao
     :accountDebit, --conta debito
     :accountCredit, -- conta credito
-    :date, -- data lançamento
+    ':date', -- data lançamento
     :value, -- valor
     ':descriptionComplement', -- complemento historico
     1, --tipo lanc

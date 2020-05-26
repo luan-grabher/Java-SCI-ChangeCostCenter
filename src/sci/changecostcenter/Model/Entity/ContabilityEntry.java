@@ -165,4 +165,21 @@ public class ContabilityEntry {
         conciliateDebit =  true;
     }
 
+    public Integer getCostCenterCredit() {
+        return costCenterCredit;
+    }
+
+    public void setCostCenterCredit(Integer costCenterCredit) {
+        this.costCenterCredit = costCenterCredit;
+    }
+
+    public Integer getCostCenterDebit() {
+        return costCenterDebit;
+    }
+
+    public void setCostCenterDebit(Integer costCenterDebit) {
+        this.costCenterDebit = costCenterDebit;
+    }
+
+    
 }

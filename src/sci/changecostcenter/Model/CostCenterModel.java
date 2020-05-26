@@ -6,6 +6,7 @@ import SimpleView.Loading;
 import fileManager.FileManager;
 import java.io.File;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,10 +111,24 @@ public class CostCenterModel {
         //Cria carregamento
         Loading loading = new Loading("Estornando lançamentos no banco", 0, reverseEntries.size());
         
-        String scriptSql = FileManager.getText(new File("\\sql\\"));
+        String scriptSql = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
         
         for (ContabilityEntry reverseEntry : reverseEntries) {
+            //Cria variavel de trocas
+            Map<String,String> variableChanges = new HashMap<>();
             
+            variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
+            variableChanges.put("accountDebit", reverseEntry.getAccountCredit() + ""); //reverse account to reverse values on database
+            variableChanges.put("accountCredit", reverseEntry.getAccountDebit() + ""); //reverse account to reverse values on database
+            variableChanges.put("date",new SimpleDateFormat("yyyy-mm-dd", Dates.BRAZIL).format(reverseEntry.getDate().getTime()));
+            variableChanges.put("value",reverseEntry.getValue().toString());
+            variableChanges.put("descriptionComplement", reverseEntry.getDescriptionComplement());
+            variableChanges.put("document", reverseEntry.getDocument());
+            variableChanges.put("participantDebit", reverseEntry.getParticipantCredit()+ "");
+            variableChanges.put("participantCredit", reverseEntry.getParticipantDebit()+ "");
+            
+            //Database.getDatabase().query(scriptSql, variableChanges);
+            System.out.println(variableChanges);
         }
     }
 }
