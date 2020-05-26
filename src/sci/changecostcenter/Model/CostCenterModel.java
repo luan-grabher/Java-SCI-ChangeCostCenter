@@ -72,6 +72,15 @@ public class CostCenterModel {
                                 if (swap.getParticipantCredit() == null || Objects.equals(swap.getParticipantCredit(), entry.getParticipantCredit())) {
                                     if (swap.getParticipantDebit() == null || Objects.equals(swap.getParticipantDebit(), entry.getParticipantDebit())) {
                                         reverseEntries.add(entry);
+
+                                        /*
+                                            AQUI VAI TER QUE COLOCAR PARA CONFORME 
+                                            OS DOIS CENTROS DE CUSTOS FOREM NULOS, 
+                                            NAO ADICIONA OS LANÇAMENTOS.
+                                            SE EXISTIR PELO MENOS UM CENTRO DE CUSTO
+                                            E NÃO HOUVER NENHUM LANÇAMENTO, CRIA UM 
+                                            LANÇAMENTO CÓPIA DO ESTORNADO.
+                                         */
                                         newEntries.addAll(swap.getEntries());
                                     }
                                 }
@@ -140,7 +149,13 @@ public class CostCenterModel {
             count++;
             loading.updateBar(count);
 
+            //insere lançamento
             insertContabilityEntryOnDatabase(newEntry);
+
+            //Define key of entry
+            newEntry.setKey(getLastContabilityEntryKey());
+
+            //Insere centros de custo
             insertContabilityEntryCostCenter(newEntry);
         }
     }
@@ -191,13 +206,32 @@ public class CostCenterModel {
 
             Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
         }
-        
-        if (entry.getCostCenterDebit()!= null) {
+
+        if (entry.getCostCenterDebit() != null) {
             variableChanges.replace("valueType", "0");
             variableChanges.replace("centerCost", entry.getCostCenterDebit() + "");
 
             Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
         }
 
+    }
+
+    private String scriptSqlGetLastContabilityEntryKey = "";
+
+    public Integer getLastContabilityEntryKey() {
+        if (scriptSqlGetLastContabilityEntryKey.isBlank()) {
+            scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
+        }
+
+        Map<String, String> variableChanges = new HashMap<>();
+        variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
+
+        ArrayList<String[]> results = Database.getDatabase().select(scriptSqlGetLastContabilityEntryKey, variableChanges);
+
+        if (!results.isEmpty()) {
+            return Integer.valueOf(results.get(0)[0]);
+        } else {
+            return 0;
+        }
     }
 }
