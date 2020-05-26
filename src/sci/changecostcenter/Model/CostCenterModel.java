@@ -70,7 +70,7 @@ public class CostCenterModel {
                         if (swap.getAccountDebit() == null || Objects.equals(swap.getAccountDebit(), entry.getAccountDebit())) {
                             if (swap.getDescriptionCode() == null || Objects.equals(swap.getDescriptionCode(), entry.getDescriptionCode())) {
                                 if (swap.getParticipantCredit() == null || Objects.equals(swap.getParticipantCredit(), entry.getParticipantCredit())) {
-                                    if (swap.getParticipantDebit()== null || Objects.equals(swap.getParticipantDebit(), entry.getParticipantDebit())) {
+                                    if (swap.getParticipantDebit() == null || Objects.equals(swap.getParticipantDebit(), entry.getParticipantDebit())) {
                                         reverseEntries.add(entry);
                                         newEntries.addAll(swap.getEntries());
                                     }
@@ -106,29 +106,51 @@ public class CostCenterModel {
     public void setNewEntries(List<ContabilityEntry> newEntries) {
         this.newEntries = newEntries;
     }
-        
-    public void reverseEntriesOnDatabase(){        
+
+    public void reverseEntriesOnDatabase() {
         //Cria carregamento
         Loading loading = new Loading("Estornando lançamentos no banco", 0, reverseEntries.size());
-        
-        String scriptSql = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
+        Integer count = 0;
         
         for (ContabilityEntry reverseEntry : reverseEntries) {
-            //Cria variavel de trocas
-            Map<String,String> variableChanges = new HashMap<>();
+            //Atualiza carregamento
+            count++;
+            loading.update(count);
             
-            variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
-            variableChanges.put("accountDebit", reverseEntry.getAccountCredit() + ""); //reverse account to reverse values on database
-            variableChanges.put("accountCredit", reverseEntry.getAccountDebit() + ""); //reverse account to reverse values on database
-            variableChanges.put("date",new SimpleDateFormat("yyyy-mm-dd", Dates.BRAZIL).format(reverseEntry.getDate().getTime()));
-            variableChanges.put("value",reverseEntry.getValue().toString());
-            variableChanges.put("descriptionComplement", reverseEntry.getDescriptionComplement());
-            variableChanges.put("document", reverseEntry.getDocument());
-            variableChanges.put("participantDebit", reverseEntry.getParticipantCredit()+ "");
-            variableChanges.put("participantCredit", reverseEntry.getParticipantDebit()+ "");
+            Integer accountCredit = reverseEntry.getAccountCredit();
+            Integer accountDebit = reverseEntry.getAccountDebit();
+            Integer participantCredit = reverseEntry.getParticipantCredit();
+            Integer participantDebit = reverseEntry.getParticipantDebit();
             
-            //Database.getDatabase().query(scriptSql, variableChanges);
-            System.out.println(variableChanges);
+            reverseEntry.setAccountCredit(accountDebit);
+            reverseEntry.setAccountDebit(accountCredit);
+            reverseEntry.setParticipantCredit(participantDebit);
+            reverseEntry.setParticipantDebit(participantCredit);
+            
+            insertContabilityEntryOnDatabase(reverseEntry);
         }
+    }
+
+    private String scriptSqlInsertContabilityEntry = "";
+
+    public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
+        if(scriptSqlInsertContabilityEntry.isBlank()){
+            scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
+        }
+        
+        //Cria variavel de trocas
+        Map<String, String> variableChanges = new HashMap<>();
+
+        variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
+        variableChanges.put("accountDebit", entry.getAccountDebit()+ ""); //reverse account to reverse values on database
+        variableChanges.put("accountCredit", entry.getAccountCredit() + ""); //reverse account to reverse values on database
+        variableChanges.put("date", new SimpleDateFormat("yyyy-mm-dd", Dates.BRAZIL).format(entry.getDate().getTime()));
+        variableChanges.put("value", entry.getValue().toString());
+        variableChanges.put("descriptionComplement", entry.getDescriptionComplement());
+        variableChanges.put("document", entry.getDocument());
+        variableChanges.put("participantDebit", entry.getParticipantDebit()+ "");
+        variableChanges.put("participantCredit", entry.getParticipantCredit() + "");
+
+        Database.getDatabase().query(scriptSqlInsertContabilityEntry, variableChanges);
     }
 }
