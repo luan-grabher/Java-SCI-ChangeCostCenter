@@ -20,7 +20,7 @@ public class Controller {
     public class defineDatabase extends Executavel {
 
         public defineDatabase() {
-            nome = "Definindo banco de dados...";
+            name = "Definindo banco de dados...";
         }
 
         @Override
@@ -32,7 +32,7 @@ public class Controller {
     public class getContabilityEntries extends Executavel {
 
         public getContabilityEntries() {
-            nome = "Buscando lançamentos contábeis sem centro de custo";
+            name = "Buscando lançamentos contábeis sem centro de custo";
         }
 
         @Override
@@ -44,7 +44,7 @@ public class Controller {
     public class getSwapList extends Executavel {
 
         public getSwapList() {
-            nome = "Buscando lista de trocas";
+            name = "Buscando lista de trocas";
         }
 
         @Override
@@ -59,7 +59,7 @@ public class Controller {
     public class createReversesList extends Executavel {
 
         public createReversesList() {
-            nome = "Criando lista de lançamentos que serão estornados e serão inseridos outros com centro de custo";
+            name = "Criando lista de lançamentos que serão estornados e serão inseridos outros com centro de custo";
         }
 
         @Override
@@ -71,7 +71,7 @@ public class Controller {
     public class reverseEntriesOnDatabase extends Executavel{
 
         public reverseEntriesOnDatabase() {
-            nome = "Estornando lançamentos no banco de dados...";
+            name = "Estornando lançamentos no banco de dados...";
         }
 
         @Override
@@ -83,7 +83,7 @@ public class Controller {
     public class insertNewEntriesOnDatabase extends Executavel{
 
         public insertNewEntriesOnDatabase() {
-            nome = "Inserindo novos lançamentos no banco de dados...";
+            name = "Inserindo novos lançamentos no banco de dados...";
         }
 
         @Override
