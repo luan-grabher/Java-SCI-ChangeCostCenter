@@ -27,6 +27,30 @@ public class ContabilityEntry {
     private Integer costCenterDebit = null;
     
     private Integer entryType = 0;
+    
+    public ContabilityEntry copy(){
+        ContabilityEntry entry = new ContabilityEntry();
+        entry.setKey(key);
+        entry.setEnterpriseCode(enterpriseCode);
+        entry.setBranch(branch);
+        entry.setDate(date);
+        entry.setDefaultPlan(defaultPlan);
+        entry.setAccountCredit(accountCredit);
+        entry.setAccountDebit(accountDebit);
+        entry.setParticipantDebit(participantDebit);
+        entry.setParticipantCredit(participantCredit);
+        entry.setDescriptionCode(descriptionCode);
+        entry.setDescriptionComplement(descriptionComplement);
+        entry.setDocument(document);
+        entry.setValue(value);
+        entry.setConciliateCredit(conciliateCredit);
+        entry.setConciliateDebit(conciliateDebit);
+        entry.setCostCenterCredit(costCenterCredit);
+        entry.setCostCenterDebit(costCenterDebit);
+        entry.setEntryType(entryType);
+        
+        return entry;
+    }
 
     public Integer getEntryType() {
         return entryType;

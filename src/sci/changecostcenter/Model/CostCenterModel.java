@@ -71,17 +71,21 @@ public class CostCenterModel {
                             if (swap.getDescriptionCode() == null || Objects.equals(swap.getDescriptionCode(), entry.getDescriptionCode())) {
                                 if (swap.getParticipantCredit() == null || Objects.equals(swap.getParticipantCredit(), entry.getParticipantCredit())) {
                                     if (swap.getParticipantDebit() == null || Objects.equals(swap.getParticipantDebit(), entry.getParticipantDebit())) {
+                                        //Adiciona aos lançamentos para estornar
                                         reverseEntries.add(entry);
 
-                                        /*
-                                            AQUI VAI TER QUE COLOCAR PARA CONFORME 
-                                            OS DOIS CENTROS DE CUSTOS FOREM NULOS, 
-                                            NAO ADICIONA OS LANÇAMENTOS.
-                                            SE EXISTIR PELO MENOS UM CENTRO DE CUSTO
-                                            E NÃO HOUVER NENHUM LANÇAMENTO, CRIA UM 
-                                            LANÇAMENTO CÓPIA DO ESTORNADO.
-                                         */
-                                        newEntries.addAll(swap.getEntries());
+                                        //Se a troca tiver algum centro de custo
+                                        if (swap.getCostCenterCredit() != null || swap.getCostCenterDebit() != null) {
+                                            List<ContabilityEntry> swapEntries =  swap.getEntries();
+                                            if(swapEntries.isEmpty()){
+                                                ContabilityEntry copyEntry = new ContabilityEntry();
+                                                copyEntry.setKey(entry.getKey());
+                                                
+                                               swapEntries.add(entry);
+                                            }
+                                            
+                                            newEntries.addAll(swapEntries);
+                                        }
                                     }
                                 }
                             }

@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import sci.changecostcenter.Model.CostCenterModel;
-import sci.changecostcenter.Model.Entity.ContabilityEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 import sql.Database;
 
@@ -15,7 +14,6 @@ public class Controller {
     private static final CostCenterModel costCenterModel = new CostCenterModel();
     
     private static String reference = "202001";
-    private static List<ContabilityEntry> contabilityEntries = new ArrayList<>();
     private static List<Swap> swaps = new ArrayList<>();
 
     public class defineDatabase extends Executavel {
@@ -41,7 +39,7 @@ public class Controller {
 
         @Override
         public void run() {
-            contabilityEntries = costCenterModel.getContabilityEntriesWithoutCostCenter(reference);
+            costCenterModel.getContabilityEntriesWithoutCostCenter(reference);
         }
     }
 
