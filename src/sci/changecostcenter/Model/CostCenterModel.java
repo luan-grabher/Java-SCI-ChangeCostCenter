@@ -77,11 +77,14 @@ public class CostCenterModel {
                                         //Se a troca tiver algum centro de custo
                                         if (swap.getCostCenterCredit() != null || swap.getCostCenterDebit() != null) {
                                             List<ContabilityEntry> swapEntries =  swap.getEntries();
+                                            //Se não tiver nenhum lançamento
                                             if(swapEntries.isEmpty()){
-                                                ContabilityEntry copyEntry = new ContabilityEntry();
-                                                copyEntry.setKey(entry.getKey());
+                                                //Adiciona o próprio lançamento com o centro de custo
+                                                ContabilityEntry copyEntry = entry.copy();
+                                                copyEntry.setCostCenterCredit(swap.getCostCenterCredit());
+                                                copyEntry.setCostCenterDebit(swap.getCostCenterDebit());
                                                 
-                                               swapEntries.add(entry);
+                                                swapEntries.add(copyEntry);
                                             }
                                             
                                             newEntries.addAll(swapEntries);
