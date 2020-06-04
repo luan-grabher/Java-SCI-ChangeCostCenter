@@ -30,7 +30,7 @@ public class CostCenterModel {
         contabilityEntries = new ArrayList<>();
 
         Map<String, String> variables = new HashMap<>();
-        variables.put("enterpriseCode", Env.get("enterpriseCode"));
+        variables.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
         variables.put("reference", reference);
 
         //Get result from Db

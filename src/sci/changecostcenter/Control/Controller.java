@@ -1,6 +1,7 @@
 package sci.changecostcenter.Control;
 
 import Entity.Executavel;
+import SimpleDotEnv.Env;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,10 @@ public class Controller {
 
         @Override
         public void run() {
-            Database.setStaticObject(new Database(new File("sci.cfg")));
+            Database.setStaticObject(new Database(new File(Env.get("databaseCfgFilePath"))));
+            if(!Database.getDatabase().testConnection()){
+                throw new Error("Erro ao conectar ao banco de dados!");
+            }
         }
     }
 
