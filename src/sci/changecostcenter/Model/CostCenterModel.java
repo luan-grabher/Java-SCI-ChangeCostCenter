@@ -67,7 +67,7 @@ public class CostCenterModel {
         this.contabilityEntries = contabilityEntries;
     }
 
-    public void importCostCenterEntries() {
+    public void importCostCenterEntriesToDatabase() {
         for (Swap swap : swaps) {
             for (CostCenterEntry entry : swap.getEntries()) {
                 if (entry.getKey() != 0) {
