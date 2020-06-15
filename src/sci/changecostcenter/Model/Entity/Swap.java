@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Swap {
 
+    private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;
     private Integer participantCredit = null;
@@ -20,6 +21,14 @@ public class Swap {
 
     public Swap() {
     }
+
+    public Integer getAccountCreditOrDebit() {
+        return accountCreditOrDebit;
+    }
+
+    public void setAccountCreditOrDebit(Integer accountCreditOrDebit) {
+        this.accountCreditOrDebit = accountCreditOrDebit;
+    }       
 
     public Integer getAccountCredit() {
         return accountCredit;
