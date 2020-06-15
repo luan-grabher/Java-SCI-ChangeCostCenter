@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
 import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
@@ -20,9 +19,6 @@ import sql.Database;
 public class CostCenterModel {
 
     private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
-
-    private List<ContabilityEntry> reverseEntries = new ArrayList<>();
-    private List<ContabilityEntry> newEntries = new ArrayList<>();
 
     private List<Swap> swaps;
 
@@ -63,109 +59,12 @@ public class CostCenterModel {
         this.swaps = swaps;
     }
 
-    public void createReversesList() {
-        for (ContabilityEntry entry : contabilityEntries) {
-            for (Swap swap : swaps) {
-                if (swap.getFilter().éFiltroDaString(entry.getDescriptionComplement())) {
-                    if (swap.getAccountCredit() == null || Objects.equals(swap.getAccountCredit(), entry.getAccountCredit())) {
-                        if (swap.getAccountDebit() == null || Objects.equals(swap.getAccountDebit(), entry.getAccountDebit())) {
-                            if (swap.getDescriptionCode() == null || Objects.equals(swap.getDescriptionCode(), entry.getDescriptionCode())) {
-                                if (swap.getParticipantCredit() == null || Objects.equals(swap.getParticipantCredit(), entry.getParticipantCredit())) {
-                                    if (swap.getParticipantDebit() == null || Objects.equals(swap.getParticipantDebit(), entry.getParticipantDebit())) {
-                                        //Adiciona aos lançamentos para estornar
-                                        reverseEntries.add(entry);
-
-                                        //Se a troca tiver algum centro de custo
-                                        if (swap.getCostCenterCredit() != null || swap.getCostCenterDebit() != null) {
-                                            List<CostCenterEntry> swapEntries =  swap.getEntries();
-                                            //Se não tiver nenhum lançamento
-                                            if(swapEntries.isEmpty()){
-                                                //Adiciona o próprio lançamento com o centro de custo
-                                                ContabilityEntry copyEntry = entry.copy();
-                                                copyEntry.setCostCenterCredit(swap.getCostCenterCredit());
-                                                copyEntry.setCostCenterDebit(swap.getCostCenterDebit());
-                                                
-                                                swapEntries.add(copyEntry);
-                                            }
-                                            
-                                            newEntries.addAll(swapEntries);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public List<ContabilityEntry> getContabilityEntries() {
         return contabilityEntries;
     }
 
     public void setContabilityEntries(List<ContabilityEntry> contabilityEntries) {
         this.contabilityEntries = contabilityEntries;
-    }
-
-    public List<ContabilityEntry> getReverseEntries() {
-        return reverseEntries;
-    }
-
-    public void setReverseEntries(List<ContabilityEntry> reverseEntries) {
-        this.reverseEntries = reverseEntries;
-    }
-
-    public List<ContabilityEntry> getNewEntries() {
-        return newEntries;
-    }
-
-    public void setNewEntries(List<ContabilityEntry> newEntries) {
-        this.newEntries = newEntries;
-    }
-
-    public void reverseEntriesOnDatabase() {
-        //Cria carregamento
-        Loading loading = new Loading("Estornando lançamentos no banco", 0, reverseEntries.size());
-        Integer count = 0;
-
-        for (ContabilityEntry reverseEntry : reverseEntries) {
-            //Atualiza carregamento
-            count++;
-            loading.updateBar(count);
-
-            Integer accountCredit = reverseEntry.getAccountCredit();
-            Integer accountDebit = reverseEntry.getAccountDebit();
-            Integer participantCredit = reverseEntry.getParticipantCredit();
-            Integer participantDebit = reverseEntry.getParticipantDebit();
-
-            reverseEntry.setAccountCredit(accountDebit);
-            reverseEntry.setAccountDebit(accountCredit);
-            reverseEntry.setParticipantCredit(participantDebit);
-            reverseEntry.setParticipantDebit(participantCredit);
-
-            insertContabilityEntryOnDatabase(reverseEntry);
-        }
-    }
-
-    public void insertNewEntriesOnDatabase() {
-        //Cria carregamento
-        Loading loading = new Loading("Inserindo novos lançamentos no banco", 0, newEntries.size());
-        Integer count = 0;
-
-        for (ContabilityEntry newEntry : newEntries) {
-            count++;
-            loading.updateBar(count);
-
-            //insere lançamento
-            insertContabilityEntryOnDatabase(newEntry);
-
-            //Define key of entry
-            newEntry.setKey(getLastContabilityEntryKey());
-
-            //Insere centros de custo
-            insertContabilityEntryCostCenter(newEntry);
-        }
     }
 
     private String scriptSqlInsertContabilityEntry = "";
@@ -193,7 +92,7 @@ public class CostCenterModel {
 
     private String scriptSqlInsertContabilityEntryCostCenter = "";
 
-    public void insertContabilityEntryCostCenter(ContabilityEntry entry) {
+    public void insertContabilityEntryCostCenter(CostCenterEntry entry) {
         if (scriptSqlInsertContabilityEntryCostCenter.isBlank()) {
             scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
         }
@@ -202,23 +101,13 @@ public class CostCenterModel {
         Map<String, String> variableChanges = new HashMap<>();
 
         variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
-        variableChanges.put("key", "chave"); //reverse account to reverse values on database
-        variableChanges.put("centerCostPlan", Env.get("centerCostPlan")); //reverse account to reverse values on database
+        variableChanges.put("centerCostPlan", Env.get("centerCostPlan"));
+        variableChanges.put("key", entry.getKey().toString()); // Chave do lançamento        
         variableChanges.put("value", entry.getValue().toString());
-        variableChanges.put("valueType", null);
-        variableChanges.put("centerCost", null);
-
-        if (entry.getCostCenterCredit() != null) {
-            variableChanges.replace("valueType", "1");
-            variableChanges.replace("centerCost", entry.getCostCenterCredit() + "");
-        }
-
-        if (entry.getCostCenterDebit() != null) {
-            variableChanges.replace("valueType", "0");
-            variableChanges.replace("centerCost", entry.getCostCenterDebit() + "");           
-        }
+        variableChanges.replace("valueType", entry.getValueType().toString());
+        variableChanges.replace("centerCost", entry.getCostCenter().toString());
+        
         Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
-
     }
 
     private String scriptSqlGetLastContabilityEntryKey = "";

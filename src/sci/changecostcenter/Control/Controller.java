@@ -59,42 +59,5 @@ public class Controller {
             costCenterModel.setSwaps(swaps);
         }
 
-    }
-
-    public class createReversesList extends Executavel {
-
-        public createReversesList() {
-            name = "Criando lista de lançamentos que serão estornados e serão inseridos outros com centro de custo";
-        }
-
-        @Override
-        public void run() {
-            costCenterModel.createReversesList();
-        }
-    }
-    
-    public class reverseEntriesOnDatabase extends Executavel{
-
-        public reverseEntriesOnDatabase() {
-            name = "Estornando lançamentos no banco de dados...";
-        }
-
-        @Override
-        public void run() {
-            costCenterModel.reverseEntriesOnDatabase();
-        }        
-    }
-    
-    public class insertNewEntriesOnDatabase extends Executavel{
-
-        public insertNewEntriesOnDatabase() {
-            name = "Inserindo novos lançamentos no banco de dados...";
-        }
-
-        @Override
-        public void run() {
-            costCenterModel.insertNewEntriesOnDatabase();
-        }
-        
-    }
+    }   
 }
