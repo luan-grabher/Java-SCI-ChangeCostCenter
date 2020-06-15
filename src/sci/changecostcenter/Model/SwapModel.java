@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
+import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 
 public class SwapModel {

@@ -67,6 +67,16 @@ public class CostCenterModel {
         this.contabilityEntries = contabilityEntries;
     }
 
+    public void importCostCenterEntries() {
+        for (Swap swap : swaps) {
+            for (CostCenterEntry entry : swap.getEntries()) {
+                if (entry.getKey() != 0) {
+                    insertContabilityEntryCostCenter(entry);
+                }
+            }
+        }
+    }
+
     private String scriptSqlInsertContabilityEntry = "";
 
     public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
@@ -106,7 +116,7 @@ public class CostCenterModel {
         variableChanges.put("value", entry.getValue().toString());
         variableChanges.replace("valueType", entry.getValueType().toString());
         variableChanges.replace("centerCost", entry.getCostCenter().toString());
-        
+
         Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
     }
 
