@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
+import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 import sql.Database;
 
@@ -76,7 +77,7 @@ public class CostCenterModel {
 
                                         //Se a troca tiver algum centro de custo
                                         if (swap.getCostCenterCredit() != null || swap.getCostCenterDebit() != null) {
-                                            List<ContabilityEntry> swapEntries =  swap.getEntries();
+                                            List<CostCenterEntry> swapEntries =  swap.getEntries();
                                             //Se não tiver nenhum lançamento
                                             if(swapEntries.isEmpty()){
                                                 //Adiciona o próprio lançamento com o centro de custo

@@ -15,7 +15,7 @@ public class Swap {
     private Integer descriptionCode = null;
     private FiltroString filter;
 
-    private List<ContabilityEntry> entries = new ArrayList<>();
+    private List<CostCenterEntry> entries = new ArrayList<>();
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
 
@@ -94,17 +94,17 @@ public class Swap {
         this.filter = filter;
     }
 
-    public List<ContabilityEntry> getEntries() {
+    public List<CostCenterEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(List<ContabilityEntry> entries) {
+    public void setEntries(List<CostCenterEntry> entries) {
         this.entries = entries;
     }
 
     public BigDecimal getTotalValue() {
         BigDecimal total = new BigDecimal(0);
-        for (ContabilityEntry entry : entries) {
+        for (CostCenterEntry entry : entries) {
             total.add(entry.getValue());
         }
 
