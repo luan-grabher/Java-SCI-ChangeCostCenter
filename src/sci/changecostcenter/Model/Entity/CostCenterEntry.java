@@ -3,9 +3,12 @@ package sci.changecostcenter.Model.Entity;
 import java.math.BigDecimal;
 
 public class CostCenterEntry {
+    public static Integer TYPE_DEBIT = 0;
+    public static Integer TYPE_CREDIT = 1;
+    
     private Integer key;
-    private Integer centerCostPlan;
-    private Integer centerCost;
+    private Integer costCenterPlan;
+    private Integer costCenter;
     private Integer valueType; /*DEBITO(0) E CREDITO(1)*/
     private BigDecimal value;
 
@@ -17,20 +20,20 @@ public class CostCenterEntry {
         this.key = key;
     }
 
-    public Integer getCenterCostPlan() {
-        return centerCostPlan;
+    public Integer getCostCenterPlan() {
+        return costCenterPlan;
     }
 
-    public void setCenterCostPlan(Integer centerCostPlan) {
-        this.centerCostPlan = centerCostPlan;
+    public void setCostCenterPlan(Integer costCenterPlan) {
+        this.costCenterPlan = costCenterPlan;
     }
 
-    public Integer getCenterCost() {
-        return centerCost;
+    public Integer getCostCenter() {
+        return costCenter;
     }
 
-    public void setCenterCost(Integer centerCost) {
-        this.centerCost = centerCost;
+    public void setCostCenter(Integer costCenter) {
+        this.costCenter = costCenter;
     }
 
     public Integer getValueType() {

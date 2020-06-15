@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Expense;
 import sci.changecostcenter.Model.Entity.Swap;
 
@@ -27,6 +28,11 @@ public class ExpenseModel {
 
     public void setFile(File file) {
         this.file = file;
+    }
+    
+    public void setExpenses(){
+        defineWorkbook();
+        getExpenseList();
     }
 
     private void defineWorkbook() {
@@ -86,8 +92,9 @@ public class ExpenseModel {
 
     /**
      * Get swap list from expenses of file
+     * @return list of swaps of expenses of file
      */
-    private List<Swap> getSwapList() {
+    public List<Swap> getSwapList() {
         List<Swap> swaps = new ArrayList<>();
 
         /*Percorre despesas das notas fiscais*/
@@ -110,7 +117,15 @@ public class ExpenseModel {
 
                     //Pega o número do centro de custo
                     Integer costCenter = Integer.valueOf(Env.get("zampieron_CostCenterNumber_" + expense.getCostCenterName()));
-                    swap.setCostCenterDebit(costCenter);                    
+                    swap.setCostCenterDebit(costCenter);      
+                    
+                    //Cria lista de inserts
+                    CostCenterEntry costCenterEntry = new CostCenterEntry();
+                    costCenterEntry.setCostCenter(expense.getCostCenter());
+                    costCenterEntry.setValueType(CostCenterEntry.TYPE_DEBIT);
+                    costCenterEntry.setValue(expense.getValue());
+                    
+                    swap.getEntries().add(costCenterEntry);
                     
                     //Adiciona Swap
                     swaps.add(swap);
