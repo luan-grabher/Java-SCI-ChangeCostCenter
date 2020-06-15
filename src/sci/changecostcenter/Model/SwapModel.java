@@ -70,19 +70,19 @@ public class SwapModel {
         }
     }
 
-    public Predicate<ContabilityEntry> entriesDescriptionComplementFilter(FiltroString filter) {
+    private Predicate<ContabilityEntry> entriesDescriptionComplementFilter(FiltroString filter) {
         return e -> filter.éFiltroDaString(e.getDescriptionComplement());
     }
 
-    public Predicate<ContabilityEntry> entriesAccount(Integer account) {
+    private Predicate<ContabilityEntry> entriesAccount(Integer account) {
         return entriesDebitAccount(account).and(entriesCreditAccount(account));
     }
 
-    public Predicate<ContabilityEntry> entriesDebitAccount(Integer account) {
+    private Predicate<ContabilityEntry> entriesDebitAccount(Integer account) {
         return e -> Objects.equals(e.getAccountDebit(), account);
     }
 
-    public Predicate<ContabilityEntry> entriesCreditAccount(Integer account) {
+    private Predicate<ContabilityEntry> entriesCreditAccount(Integer account) {
         return e -> Objects.equals(e.getAccountCredit(), account);
     }
 }
