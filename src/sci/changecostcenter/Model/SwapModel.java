@@ -17,7 +17,10 @@ public class SwapModel {
     }
     
     public void importExpenseSwaps(File file){
-        
+        ExpenseModel model = new ExpenseModel();
+        model.setFile(file);
+        model.setExpenses();
+        swaps.addAll(model.getSwapList());
     }
     
     
