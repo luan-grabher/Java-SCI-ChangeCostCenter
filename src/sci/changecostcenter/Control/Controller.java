@@ -19,7 +19,11 @@ public class Controller {
     private static final SwapModel swapModel = new SwapModel();
 
     private static String reference = "202001";
-    private static List<Swap> swaps = new ArrayList<>();
+    private static final List<Swap> swaps = new ArrayList<>();
+
+    public static void setReference(String reference) {
+        Controller.reference = reference;
+    }       
 
     public class defineDatabase extends Executavel {
 
@@ -34,7 +38,7 @@ public class Controller {
                 throw new Error("Erro ao conectar ao banco de dados!");
             }
         }
-    }
+    }   
 
     public class getContabilityEntries extends Executavel {
 
