@@ -87,9 +87,23 @@ public class Controller {
         @Override
         public void run() {
             //Set swaps
+            swapModel.setKeysOfSwaps(costCenterModel.getContabilityEntries());
             //Function to create a swap list
             costCenterModel.setSwaps(swaps);
         }
 
+    }
+    
+    public class importCostCenterEntriesToDatabase extends Executavel{
+
+        public importCostCenterEntriesToDatabase() {
+            name = "Importando centros de custos dos lançamentos para o banco de dados";
+        }
+
+        @Override
+        public void run() {
+            costCenterModel.importCostCenterEntriesToDatabase();
+        }
+        
     }
 }
