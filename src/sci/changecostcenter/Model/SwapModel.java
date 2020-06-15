@@ -23,5 +23,12 @@ public class SwapModel {
         swaps.addAll(model.getSwapList());
     }
     
+    public void importSwapFileSwaps(File file){
+        SwapFileModel model = new SwapFileModel();
+        model.setFile(file);
+        model.setSwaps();
+        swaps.addAll(model.getSwaps());
+    }
+    
     
 }

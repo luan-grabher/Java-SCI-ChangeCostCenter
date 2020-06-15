@@ -131,9 +131,7 @@ public class ExpenseModel {
                     swaps.add(swap);
                 } catch (Exception e) {
                 }
-
             }
-
         }
 
         return swaps;

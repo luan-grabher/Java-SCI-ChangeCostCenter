@@ -211,16 +211,13 @@ public class CostCenterModel {
         if (entry.getCostCenterCredit() != null) {
             variableChanges.replace("valueType", "1");
             variableChanges.replace("centerCost", entry.getCostCenterCredit() + "");
-
-            Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
         }
 
         if (entry.getCostCenterDebit() != null) {
             variableChanges.replace("valueType", "0");
-            variableChanges.replace("centerCost", entry.getCostCenterDebit() + "");
-
-            Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
+            variableChanges.replace("centerCost", entry.getCostCenterDebit() + "");           
         }
+        Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
 
     }
 
