@@ -3,8 +3,10 @@ package sci.changecostcenter.Model;
 import JExcel.JExcel;
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -18,7 +20,7 @@ public class ExpenseModel {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
-    private Map<String, Expense> expenses = new HashMap<>();
+    private Map<String, List<Expense>> expenses = new HashMap<>();
 
     public void setFile(File file) {
         this.file = file;
@@ -46,11 +48,40 @@ public class ExpenseModel {
         Integer colDueDate = JExcel.Cell("J");
         Integer colTitle = JExcel.Cell("L");
 
-        for (int i = 0;
-                i < sheet.getLastRowNum();
-                i++) {
-            XSSFRow XSSFRow = sheet.getRow(i);
+        for (int i = 0; i < sheet.getLastRowNum(); i++) {
+            try {
+                XSSFRow row = sheet.getRow(i);
+
+                Expense expense = new Expense();
+                expense.setDre(row.getCell(colDre).getStringCellValue());
+                expense.setExpenseDescription(row.getCell(colExpenseDescription).getStringCellValue());
+                expense.setCostCenterName(row.getCell(colCostCenterName).getStringCellValue());
+                expense.setNatureCode(row.getCell(colNatureCode).getStringCellValue());
+                expense.setNatureDescription(row.getCell(colNatureDescription).getStringCellValue());
+                expense.setProvider(row.getCell(colProvider).getStringCellValue());
+                expense.setProviderName(row.getCell(colProviderName).getStringCellValue());
+                expense.setValue(new BigDecimal(Double.toString(row.getCell(colValue).getNumericCellValue())));
+                
+                Calendar date = Calendar.getInstance();
+                date.setTime(row.getCell(colDate).getDateCellValue());
+                expense.setDate(date);
+                
+                Calendar dueDate = Calendar.getInstance();
+                dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
+                expense.setDueDate(dueDate);
+                
+                expense.setTitle(row.getCell(colTitle).getStringCellValue());
+                
+                if(!expenses.containsKey(expense.getTitle())){
+                    expenses.put(expense.getTitle(), new ArrayList<>());                    
+                }
+                expenses.get(expense.getTitle()).add(expense);
+            } catch (Exception e) {
+            }
         }
     }
 
+    public Map<String, List<Expense>> getExpenses() {
+        return expenses;
+    }   
 }
