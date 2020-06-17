@@ -23,7 +23,7 @@ public class Controller {
 
     public void setReference(String reference) {
         this.reference = reference;
-    }       
+    }
 
     public class defineDatabase extends Executavel {
 
@@ -33,12 +33,20 @@ public class Controller {
 
         @Override
         public void run() {
-            Database.setStaticObject(new Database(new File(Env.get("databaseCfgFilePath"))));
-            if (!Database.getDatabase().testConnection()) {
-                throw new Error("Erro ao conectar ao banco de dados!");
+            File databseConfigFile = new File(Env.get("databaseCfgFilePath"));
+            
+            File[] folderFiles = new File("").listFiles();           
+
+            if (databseConfigFile.exists()) {
+                Database.setStaticObject(new Database(databseConfigFile));
+                if (!Database.getDatabase().testConnection()) {
+                    throw new Error("Erro ao conectar ao banco de dados!");
+                }
+            } else {
+                throw new Error("O arquivo de configuração do banco de dados não foi encontrado em: "  + databseConfigFile.getAbsolutePath());
             }
         }
-    }   
+    }
 
     public class getContabilityEntries extends Executavel {
 
@@ -97,8 +105,8 @@ public class Controller {
         }
 
     }
-    
-    public class importCostCenterEntriesToDatabase extends Executavel{
+
+    public class importCostCenterEntriesToDatabase extends Executavel {
 
         public importCostCenterEntriesToDatabase() {
             name = "Importando centros de custos dos lançamentos para o banco de dados";
@@ -108,6 +116,6 @@ public class Controller {
         public void run() {
             costCenterModel.importCostCenterEntriesToDatabase();
         }
-        
+
     }
 }
