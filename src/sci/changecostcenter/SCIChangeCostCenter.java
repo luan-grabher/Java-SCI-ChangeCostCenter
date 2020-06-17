@@ -1,7 +1,6 @@
 package sci.changecostcenter;
 
 import Entity.Executavel;
-import Executor.Execution;
 import Robo.AppRobo;
 import java.io.File;
 import java.util.ArrayList;
