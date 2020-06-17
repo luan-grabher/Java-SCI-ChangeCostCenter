@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import sci.changecostcenter.Model.CostCenterModel;
 import sci.changecostcenter.Model.Entity.Swap;
-import sci.changecostcenter.Model.ExpenseModel;
-import sci.changecostcenter.Model.SwapFileModel;
 import sci.changecostcenter.Model.SwapModel;
 import sql.Database;
 
@@ -34,8 +32,6 @@ public class Controller {
         @Override
         public void run() {
             File databseConfigFile = new File(Env.get("databaseCfgFilePath"));
-            
-            File[] folderFiles = new File("").listFiles();           
 
             if (databseConfigFile.exists()) {
                 Database.setStaticObject(new Database(databseConfigFile));
