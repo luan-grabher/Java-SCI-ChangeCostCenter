@@ -15,14 +15,14 @@ import sql.Database;
 public class Controller {
 
     //Models
-    private static final CostCenterModel costCenterModel = new CostCenterModel();
-    private static final SwapModel swapModel = new SwapModel();
+    private final CostCenterModel costCenterModel = new CostCenterModel();
+    private final SwapModel swapModel = new SwapModel();
 
-    private static String reference = "202001";
-    private static final List<Swap> swaps = new ArrayList<>();
+    private String reference = "202001";
+    private final List<Swap> swaps = new ArrayList<>();
 
-    public static void setReference(String reference) {
-        Controller.reference = reference;
+    public void setReference(String reference) {
+        this.reference = reference;
     }       
 
     public class defineDatabase extends Executavel {
