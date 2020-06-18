@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
-import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 
 public class SwapModel {
@@ -34,10 +33,10 @@ public class SwapModel {
     }
 
     public void setKeysOfSwaps(List<ContabilityEntry> entries) {
-        //Percorre swaps
+        //Percorre trocas
         for (Swap swap : swaps) {
             //Define predicado
-            Predicate predicate;
+            Predicate predicate;            
            
             if (swap.getFilter() != null) {
                 //Se tiver filtro
@@ -60,8 +59,10 @@ public class SwapModel {
                 //Busca lançamento que possua o filtro no complemento
                 Optional<ContabilityEntry> optionalEntry = entries.stream().filter(predicate).findFirst();
                 if (optionalEntry.isPresent()) {
+                    //Cria Objeto do lançamento
                     ContabilityEntry entry = optionalEntry.get();
 
+                    //Pega o primeiro lançamento da troca e define a chave do lançamento
                     swap.getEntries().get(0).setKey(entry.getKey());
                 }
             } catch (Exception e) {

@@ -34,7 +34,7 @@ public class SwapFileModel {
 
                 //Se "remover" as letras da coluna e a coluna continuar igual, quer dizer que não tem letras
                 //Se tiver letras, ou seja, o replace trazer algo diferente, não deve continuar
-                if (collumns[colAccountCredit].replaceAll("[^a-zA-Z]+", "").equals(collumns[colAccountCredit])) {
+                if (collumns[colAccountCredit].replaceAll("[a-zA-Z]+", "").equals(collumns[colAccountCredit])) {
 
                     //Define conta utilizada
                     Integer accountCredit = Integer.valueOf(collumns[colAccountCredit]);

@@ -17,7 +17,6 @@ public class Controller {
     private final SwapModel swapModel = new SwapModel();
 
     private String reference = "202001";
-    private final List<Swap> swaps = new ArrayList<>();
 
     public void setReference(String reference) {
         this.reference = reference;
@@ -58,7 +57,7 @@ public class Controller {
 
     public class setExpensesFile extends Executavel {
 
-        private File file;
+        private final File file;
 
         public setExpensesFile(File file) {
             name = "Definindo arquivo de despesas";
@@ -73,7 +72,7 @@ public class Controller {
 
     public class setSwapsFile extends Executavel {
 
-        private File file;
+        private final File file;
 
         public setSwapsFile(File file) {
             name = "Definindo arquivo de trocas";
@@ -97,7 +96,7 @@ public class Controller {
             //Set swaps
             swapModel.setKeysOfSwaps(costCenterModel.getContabilityEntries());
             //Function to create a swap list
-            costCenterModel.setSwaps(swaps);
+            costCenterModel.setSwaps(swapModel.getSwaps());
         }
 
     }

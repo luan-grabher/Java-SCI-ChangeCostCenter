@@ -51,8 +51,9 @@ public class CostCenterModel {
             entry.setParticipantCredit(result[12]==null?null:Integer.valueOf(result[12]));
 
             contabilityEntries.add(entry);
-            
-            System.out.println("Encontrado lançamento contabil: " + entry.getKey() + " - " + entry.getDate() + " - " + entry.getValue() + " - " + entry.getDescriptionComplement() + " - ");
+            //if((result[4]==null?0:Integer.valueOf(result[4])) == 265){
+            //    System.out.println("Encontrado lançamento contabil: " + result[1]);
+            //}            
         }
 
         return contabilityEntries;
