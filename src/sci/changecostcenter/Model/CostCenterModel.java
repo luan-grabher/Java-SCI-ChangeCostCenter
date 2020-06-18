@@ -51,6 +51,8 @@ public class CostCenterModel {
             entry.setParticipantCredit(result[12]==null?null:Integer.valueOf(result[12]));
 
             contabilityEntries.add(entry);
+            
+            System.out.println("Encontrado lançamento contabil: " + entry.getKey() + " - " + entry.getDate() + " - " + entry.getValue() + " - " + entry.getDescriptionComplement() + " - ");
         }
 
         return contabilityEntries;
@@ -78,13 +80,9 @@ public class CostCenterModel {
         }
     }
 
-    private String scriptSqlInsertContabilityEntry = "";
+    private final String scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
 
     public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
-        if (scriptSqlInsertContabilityEntry.isBlank()) {
-            scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
-        }
-
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
 
@@ -101,13 +99,9 @@ public class CostCenterModel {
         Database.getDatabase().query(scriptSqlInsertContabilityEntry, variableChanges);
     }
 
-    private String scriptSqlInsertContabilityEntryCostCenter = "";
+    private final String scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
 
     public void insertContabilityEntryCostCenter(CostCenterEntry entry) {
-        if (scriptSqlInsertContabilityEntryCostCenter.isBlank()) {
-            scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
-        }
-
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
 
@@ -119,15 +113,13 @@ public class CostCenterModel {
         variableChanges.replace("centerCost", entry.getCostCenter().toString());
 
         Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
+        
+        System.out.println("Inserido centro de custo " + entry.getCostCenter() + " na chave " + entry.getKey());
     }
 
-    private String scriptSqlGetLastContabilityEntryKey = "";
+    private final String scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
 
     public Integer getLastContabilityEntryKey() {
-        if (scriptSqlGetLastContabilityEntryKey.isBlank()) {
-            scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
-        }
-
         Map<String, String> variableChanges = new HashMap<>();
         variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
 
