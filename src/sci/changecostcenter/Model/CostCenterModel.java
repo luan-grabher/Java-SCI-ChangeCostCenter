@@ -110,8 +110,8 @@ public class CostCenterModel {
         variableChanges.put("centerCostPlan", Env.get("centerCostPlan"));
         variableChanges.put("key", entry.getKey().toString()); // Chave do lançamento        
         variableChanges.put("value", entry.getValue().toString());
-        variableChanges.replace("valueType", entry.getValueType().toString());
-        variableChanges.replace("centerCost", entry.getCostCenter().toString());
+        variableChanges.put("valueType", entry.getValueType().toString());
+        variableChanges.put("centerCost", entry.getCostCenter().toString());
 
         Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
         
