@@ -42,13 +42,13 @@ public class SwapModel {
             if (swap.getFilter() != null) {
                 //Se tiver filtro
                 predicate = entriesDescriptionComplementFilter(swap.getFilter());
-            } else if(swap.getAccountCreditOrDebit() != 0){
+            } else if(swap.getAccountCreditOrDebit() != null){
                 //Se tiver conta de debito e credito
                 predicate = entriesAccount(swap.getAccountCreditOrDebit());
-            }else if(swap.getAccountCredit() != 0){
+            }else if(swap.getAccountCredit() != null){
                 //Se tiver conta de credito
                 predicate = entriesCreditAccount(swap.getAccountCredit());
-            }else if(swap.getAccountDebit() != 0){
+            }else if(swap.getAccountDebit() != null){
                 //Se tiver conta de debito
                 predicate = entriesDebitAccount(swap.getAccountDebit());
             }else{

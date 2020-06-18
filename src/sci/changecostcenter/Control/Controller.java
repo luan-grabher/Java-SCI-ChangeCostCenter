@@ -21,7 +21,7 @@ public class Controller {
 
     public void setReference(String reference) {
         this.reference = reference;
-    }
+    }    
 
     public class defineDatabase extends Executavel {
 

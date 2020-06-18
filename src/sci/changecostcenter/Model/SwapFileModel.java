@@ -31,46 +31,53 @@ public class SwapFileModel {
         for (String line : lines) {
             try {
                 String[] collumns = line.split(";");
-                
-                //Define conta utilizada
-                Integer accountCredit = Integer.valueOf(collumns[colAccountCredit]);
-                Integer accountDebit = Integer.valueOf(collumns[colAccountDebit]);
-                Integer costCenterCredit = Integer.valueOf(collumns[colCostCenterCredit]);
-                Integer costCenterDebit = Integer.valueOf(collumns[colCostCenterDebit]);
 
-                //Cria objeto de troca
-                Swap swap = new Swap();
-                
-                //Define conta do da troca
-                if(accountCredit != 0){
-                    swap.setAccountCredit(accountCredit);
-                }else{
-                    swap.setAccountDebit(accountDebit);
+                //Se "remover" as letras da coluna e a coluna continuar igual, quer dizer que não tem letras
+                //Se tiver letras, ou seja, o replace trazer algo diferente, não deve continuar
+                if (collumns[colAccountCredit].replaceAll("[^a-zA-Z]+", "").equals(collumns[colAccountCredit])) {
+
+                    //Define conta utilizada
+                    Integer accountCredit = Integer.valueOf(collumns[colAccountCredit]);
+                    Integer accountDebit = Integer.valueOf(collumns[colAccountDebit]);
+                    Integer costCenterCredit = Integer.valueOf(collumns[colCostCenterCredit]);
+                    Integer costCenterDebit = Integer.valueOf(collumns[colCostCenterDebit]);
+
+                    //Cria objeto de troca
+                    Swap swap = new Swap();
+
+                    //Define conta do da troca
+                    if (accountCredit != 0) {
+                        swap.setAccountCredit(accountCredit);
+                    } else {
+                        swap.setAccountDebit(accountDebit);
+                    }
+
+                    //Define centro de custo da troca
+                    Integer costCenter;
+                    Integer valueType;
+                    if (costCenterCredit != 0) {
+                        costCenter = costCenterCredit;
+                        valueType = CostCenterEntry.TYPE_CREDIT;
+                        swap.setCostCenterCredit(costCenterCredit);
+                    } else {
+                        costCenter = costCenterDebit;
+                        valueType = CostCenterEntry.TYPE_DEBIT;
+                        swap.setCostCenterDebit(costCenterDebit);
+                    }
+
+                    //Cria lançamento para a troca
+                    CostCenterEntry costCenterEntry = new CostCenterEntry();
+                    costCenterEntry.setCostCenter(costCenter);
+                    costCenterEntry.setValueType(valueType);
+
+                    String valueString = collumns[colValue].replaceAll("\\.", "").replaceAll(",", ".");
+                    costCenterEntry.setValue(new BigDecimal(valueString));
+
+                    //Adiciona lançamento na troca
+                    swap.getEntries().add(costCenterEntry);
+
+                    swaps.add(swap);
                 }
-                
-                //Define centro de custo da troca
-                Integer costCenter;
-                Integer valueType;
-                if(costCenterCredit != 0){
-                    costCenter = costCenterCredit;
-                    valueType = CostCenterEntry.TYPE_CREDIT;
-                    swap.setCostCenterCredit(costCenterCredit);
-                }else{
-                    costCenter = costCenterDebit;
-                    valueType = CostCenterEntry.TYPE_DEBIT;
-                    swap.setCostCenterDebit(costCenterDebit);
-                }
-                
-                //Cria lançamento para a troca
-                CostCenterEntry costCenterEntry = new CostCenterEntry();
-                costCenterEntry.setCostCenter(costCenter);
-                costCenterEntry.setValueType(valueType);
-                costCenterEntry.setValue(new BigDecimal(collumns[colValue]));
-                
-                //Adiciona lançamento na troca
-                swap.getEntries().add(costCenterEntry);
-                
-                swaps.add(swap);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -79,5 +86,5 @@ public class SwapFileModel {
 
     public List<Swap> getSwaps() {
         return swaps;
-    }    
+    }
 }

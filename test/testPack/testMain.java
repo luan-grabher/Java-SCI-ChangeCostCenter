@@ -28,7 +28,7 @@ public class testMain {
     }
 
     public static void mainFunction() {
-        Integer month = 4;
+        Integer month = 5;
         Integer year = 2020;
 
         String name = "Teste";
@@ -38,7 +38,7 @@ public class testMain {
         File swapsFile = new File(folder.getAbsolutePath() + "\\CENTRO DE CUSTO CREDITOS PIS COFINS 05.2020.csv");
         File expensesFile = new File(folder.getAbsolutePath() + "\\branco.xlsx");
 
-        SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile);
+        System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
     }
 
 }
