@@ -3,10 +3,7 @@ package sci.changecostcenter.Control;
 import Entity.Executavel;
 import SimpleDotEnv.Env;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import sci.changecostcenter.Model.CostCenterModel;
-import sci.changecostcenter.Model.Entity.Swap;
 import sci.changecostcenter.Model.SwapModel;
 import sql.Database;
 
@@ -53,6 +50,19 @@ public class Controller {
         public void run() {
             costCenterModel.getContabilityEntriesWithoutCostCenter(reference);
         }
+    }
+    
+    public class getReferenceCostCenters extends Executavel{
+
+        public getReferenceCostCenters() {
+            name = "Buscando centros de custo da referência " + reference;
+        }
+
+        @Override
+        public void run() {
+            costCenterModel.getReferenceCostCenterEntries(reference);
+        }
+        
     }
 
     public class setExpensesFile extends Executavel {

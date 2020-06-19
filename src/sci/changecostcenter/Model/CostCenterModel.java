@@ -18,13 +18,13 @@ import sql.Database;
 public class CostCenterModel {
 
     private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
-    private List<CostCenterEntry> costCenters = new ArrayList<>();
+    private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
 
     private List<Swap> swaps;
 
     public List<CostCenterEntry> getReferenceCostCenterEntries(String reference) {
         //Reset
-        costCenters = new ArrayList<>();
+        referenceCostCenters = new ArrayList<>();
 
         Map<String, String> variables = new HashMap<>();
         variables.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
@@ -32,10 +32,28 @@ public class CostCenterModel {
 
         List<String[]> results = Database.getDatabase().select(new File("sql\\selectReferenceContabilityEntriesCostCenters.sql"), variables);
         
+        //TRansforma resultado em objetos
+        for (String[] result : results) {
+            //Inicia objeto
+            CostCenterEntry entry = new CostCenterEntry();
+            
+            entry.setKey(Integer.valueOf(result[1]));
+            entry.setCostCenterPlan(Integer.valueOf(result[2]));
+            entry.setCostCenter(Integer.valueOf(result[3]));
+            entry.setValueType(Integer.valueOf(result[4]));
+            entry.setValue(new BigDecimal(result[5]));
+            entry.setCreditAccount(result[6] == null?null:Integer.valueOf(result[6]));
+            entry.setDebitAccount(result[7] == null?null:Integer.valueOf(result[7]));
+            
+            referenceCostCenters.add(entry);
+        }
         
-        
-        return costCenters;
+        return referenceCostCenters;
     }
+
+    public List<CostCenterEntry> getReferenceCostCenters() {
+        return referenceCostCenters;
+    }        
 
     public List<ContabilityEntry> getContabilityEntriesWithoutCostCenter(String reference) {
         //Reset

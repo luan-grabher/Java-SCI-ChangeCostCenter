@@ -37,6 +37,7 @@ public class SCIChangeCostCenter {
             List<Executavel> execs = new ArrayList<>();
 
             execs.add(controller.new defineDatabase());
+            execs.add(controller.new getReferenceCostCenters());
             execs.add(controller.new getContabilityEntries());
             execs.add(controller.new setExpensesFile(expensesFile));
             execs.add(controller.new setSwapsFile(swapsFile));
