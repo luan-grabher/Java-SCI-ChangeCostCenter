@@ -11,6 +11,24 @@ public class CostCenterEntry {
     private Integer costCenter;
     private Integer valueType; /*DEBITO(0) E CREDITO(1)*/
     private BigDecimal value;
+    private Integer debitAccount;
+    private Integer creditAccount;
+
+    public Integer getDebitAccount() {
+        return debitAccount;
+    }
+
+    public void setDebitAccount(Integer debitAccount) {
+        this.debitAccount = debitAccount;
+    }
+
+    public Integer getCreditAccount() {
+        return creditAccount;
+    }
+
+    public void setCreditAccount(Integer creditAccount) {
+        this.creditAccount = creditAccount;
+    }       
 
     public Integer getKey() {
         return key;
