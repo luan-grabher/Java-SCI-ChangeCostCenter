@@ -60,7 +60,7 @@ public class Controller {
 
         @Override
         public void run() {
-            costCenterModel.getReferenceCostCenterEntries(reference);
+            swapModel.setReferenceCostCenters(costCenterModel.getReferenceCostCenterEntries(reference));
         }
         
     }

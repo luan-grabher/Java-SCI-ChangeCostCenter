@@ -8,11 +8,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
+import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 
 public class SwapModel {
 
     private List<Swap> swaps = new ArrayList<>();
+    private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
+
+    public List<CostCenterEntry> getReferenceCostCenters() {
+        return referenceCostCenters;
+    }
+
+    public void setReferenceCostCenters(List<CostCenterEntry> referenceCostCenters) {
+        this.referenceCostCenters = referenceCostCenters;
+    }
 
     public List<Swap> getSwaps() {
         return swaps;
@@ -28,6 +38,7 @@ public class SwapModel {
     public void importSwapFileSwaps(File file) {
         SwapFileModel model = new SwapFileModel();
         model.setFile(file);
+        model.setReferenceCostCenters(referenceCostCenters);
         model.setSwaps();
         swaps.addAll(model.getSwaps());
     }
@@ -36,21 +47,21 @@ public class SwapModel {
         //Percorre trocas
         for (Swap swap : swaps) {
             //Define predicado
-            Predicate predicate;            
-           
+            Predicate predicate;
+
             if (swap.getFilter() != null) {
                 //Se tiver filtro
                 predicate = entriesDescriptionComplementFilter(swap.getFilter());
-            } else if(swap.getAccountCreditOrDebit() != null){
+            } else if (swap.getAccountCreditOrDebit() != null) {
                 //Se tiver conta de debito e credito
                 predicate = entriesAccount(swap.getAccountCreditOrDebit());
-            }else if(swap.getAccountCredit() != null){
+            } else if (swap.getAccountCredit() != null) {
                 //Se tiver conta de credito
                 predicate = entriesCreditAccount(swap.getAccountCredit());
-            }else if(swap.getAccountDebit() != null){
+            } else if (swap.getAccountDebit() != null) {
                 //Se tiver conta de debito
                 predicate = entriesDebitAccount(swap.getAccountDebit());
-            }else{
+            } else {
                 //Se nenhuma das opções
                 predicate = null;
             }
