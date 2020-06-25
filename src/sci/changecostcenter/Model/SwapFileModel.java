@@ -28,7 +28,7 @@ public class SwapFileModel {
         this.file = file;
     }
 
-    public void setSwaps() {
+    public void setSwaps() {       
         Integer colAccountCredit = 0;
         Integer colAccountDebit = 1;
         Integer colCostCenterDebit = 2;
