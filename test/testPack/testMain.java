@@ -35,7 +35,7 @@ public class testMain {
 
         File folder = new File("G:\\Contábil\\Clientes\\Zampieron & Dalallacorte\\Escrituração Mensal\\2020\\Movimento");
 
-        File swapsFile = new File(folder.getAbsolutePath() + "\\CENTRO DE CUSTO CREDITOS PIS COFINS 05.2020.csv");
+        File swapsFile = new File(folder.getAbsolutePath() + "\\CENTRO DE CUSTO CREDITOS PIS COFINS 06.2020.csv");
         File expensesFile = new File(folder.getAbsolutePath() + "\\branco.xlsx");
 
         System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
