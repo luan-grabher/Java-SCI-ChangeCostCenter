@@ -15,10 +15,16 @@ public class Controller {
 
     private String reference = "202001";
 
+    /** Define Referencia
+     *  @param reference Referencia AAAAMM
+     */
     public void setReference(String reference) {
         this.reference = reference;
     }    
 
+    /** 
+     * Define Database estático conforme local definido no arquivo ENV
+     */
     public class defineDatabase extends Executavel {
 
         public defineDatabase() {
@@ -40,6 +46,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Cria lista de lançamentos que não tem centro de custo naquela referência
+     */
     public class getContabilityEntries extends Executavel {
 
         public getContabilityEntries() {
@@ -52,6 +61,9 @@ public class Controller {
         }
     }
     
+    /**
+     * Cria lista de Centros de custo dos lançamentos do mês da referência
+     */
     public class getReferenceCostCenters extends Executavel{
 
         public getReferenceCostCenters() {
@@ -65,6 +77,10 @@ public class Controller {
         
     }
 
+    
+    /**
+     * Cria lista de trocas do arquivo de Despesas
+     */
     public class setExpensesFile extends Executavel {
 
         private final File file;
@@ -80,6 +96,9 @@ public class Controller {
         }
     }
 
+    /**
+     *  Cria lista de trocas do arquivo de Trocas PIS COFINS
+     */
     public class setSwapsFile extends Executavel {
 
         private final File file;

@@ -43,9 +43,8 @@ public class SwapFileModel {
             try {
                 String[] collumns = line.split(";");
 
-                //Se "remover" as letras da coluna e a coluna continuar igual, quer dizer que não tem letras
-                //Se tiver letras, ou seja, o replace trazer algo diferente, não deve continuar
-                if (collumns[colAccountCredit].replaceAll("[a-zA-Z]+", "").equals(collumns[colAccountCredit])) {
+                //Verifica se existem apenas números na coluna de conta de crédito e débito
+                if (collumns[colAccountCredit].matches("[0-9]+") && collumns[colAccountDebit].matches("[0-9]+")) {
 
                     //Define conta utilizada
                     Integer accountCredit = Integer.valueOf(collumns[colAccountCredit]);
@@ -53,13 +52,13 @@ public class SwapFileModel {
                     Integer costCenterCredit = Integer.valueOf(collumns[colCostCenterCredit]);
                     Integer costCenterDebit = Integer.valueOf(collumns[colCostCenterDebit]);
 
-                    //Cria PRedicados
+                    //Cria Predicados
                     Predicate<CostCenterEntry> predicateAccount;
 
                     //Cria objeto de troca
                     Swap swap = new Swap();
 
-                    //Define conta do da troca e o predicado
+                    //Define conta da troca e do predicado
                     if (accountCredit != 0) {
                         swap.setAccountCredit(accountCredit);
                         predicateAccount = centerCostHasCreditAccount(accountCredit);
@@ -87,12 +86,13 @@ public class SwapFileModel {
 
                     //Veririca se nao existe no banco ja um centro de custo
                     boolean costCenterAlreadyExist = referenceCostCenters.stream().anyMatch(
-                            predicateAccount.and(
-                                    c -> Objects.equals(c.getCostCenter(), costCenter))
+                            predicateAccount
+                                    .and(
+                                            c -> Objects.equals(c.getCostCenter(), costCenter))
                                     .and(
                                             c -> Objects.equals(c.getValueType(), valueType))
-                                    .and(
-                                            c -> c.getValue().compareTo(value) == 0)
+                                    /*.and(
+                                            c -> c.getValue().compareTo(value) == 0)*/
                     );
                     
                     if(!costCenterAlreadyExist){
