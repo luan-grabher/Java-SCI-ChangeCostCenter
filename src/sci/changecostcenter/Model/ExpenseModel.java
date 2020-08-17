@@ -45,17 +45,17 @@ public class ExpenseModel {
     }
 
     private void getExpenseList() {
-        Integer colDre = JExcel.Cell("A");
-        Integer colExpenseDescription = JExcel.Cell("B");
-        Integer colCostCenterName = JExcel.Cell("C");
-        Integer colNatureCode = JExcel.Cell("D");
-        Integer colNatureDescription = JExcel.Cell("E");
-        Integer colProvider = JExcel.Cell("F");
-        Integer colProviderName = JExcel.Cell("G");
-        Integer colValue = JExcel.Cell("H");
-        Integer colDate = JExcel.Cell("I");
-        Integer colDueDate = JExcel.Cell("J");
-        Integer colTitle = JExcel.Cell("L");
+        Integer colDre = JExcel.Cell(Env.get("coluna_DRE"));
+        Integer colExpenseDescription = JExcel.Cell(Env.get("coluna_Descrição Despesa"));
+        Integer colCostCenterName = JExcel.Cell(Env.get("coluna_Nome CC"));
+        Integer colNatureCode = JExcel.Cell(Env.get("coluna_Codigo Natureza"));
+        Integer colNatureDescription = JExcel.Cell(Env.get("coluna_Descrição Natureza"));
+        Integer colProvider = JExcel.Cell(Env.get("coluna_Fornecedor"));
+        Integer colProviderName = JExcel.Cell(Env.get("coluna_Nome Fornecedor"));
+        Integer colValue = JExcel.Cell(Env.get("coluna_Valor"));
+        Integer colDate = JExcel.Cell(Env.get("coluna_Data"));
+        Integer colDueDate = JExcel.Cell(Env.get("coluna_Data Pagamento"));
+        Integer colTitle = JExcel.Cell(Env.get("coluna_Titulo"));
 
         for (int i = 0; i < sheet.getLastRowNum(); i++) {
             try {
@@ -88,6 +88,10 @@ public class ExpenseModel {
             } catch (Exception e) {
             }
         }
+        
+        if(expenses.isEmpty()){
+            throw new Error("Nenhuma despesa encontrada no arquivo de despesas");
+        }
     }
 
     /**
@@ -116,7 +120,7 @@ public class ExpenseModel {
                     swap.getFilter().setPossui(hasList);
 
                     //Pega o número do centro de custo
-                    Integer costCenter = Integer.valueOf(Env.get("zampieron_CostCenterNumber_" + expense.getCostCenterName()));
+                    Integer costCenter = Integer.valueOf(Env.get("costCenterNumber_" + expense.getCostCenterName()));
                     swap.setCostCenterDebit(costCenter);      
                     
                     //Cria lista de inserts

@@ -28,15 +28,15 @@ public class testMain {
     }
 
     public static void mainFunction() {
-        Integer month = 6;
+        Integer month = 7;
         Integer year = 2020;
 
         String name = "Teste";
 
         File folder = new File("G:\\Contábil\\Clientes\\Zampieron & Dalallacorte\\Escrituração Mensal\\2020\\Movimento");
 
-        File swapsFile = new File(folder.getAbsolutePath() + "\\CENTRO DE CUSTO CREDITOS PIS COFINS 06.2020.csv");
-        File expensesFile = new File(folder.getAbsolutePath() + "\\branco.xlsx");
+        File swapsFile = new File(folder.getAbsolutePath() + "\\csv em branco.csv");
+        File expensesFile = new File(folder.getAbsolutePath() + "\\Despesas por Centros de Custos - Real até Julho20 (base vcto Real CPag de 05.08.20).xlsx");
 
         System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
     }
