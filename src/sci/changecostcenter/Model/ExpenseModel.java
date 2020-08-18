@@ -39,7 +39,7 @@ public class ExpenseModel {
     private void defineWorkbook() {
         try {
             workbook = new XSSFWorkbook(file);
-            sheet = workbook.getSheetAt(1);
+            sheet = workbook.getSheetAt(workbook.getFirstVisibleTab());
         } catch (Exception e) {
             e.printStackTrace();
         }
