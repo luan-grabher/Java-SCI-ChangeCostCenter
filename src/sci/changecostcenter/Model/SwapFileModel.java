@@ -1,5 +1,6 @@
 package sci.changecostcenter.Model;
 
+import Entity.ErrorIgnore;
 import fileManager.FileManager;
 import java.io.File;
 import java.math.BigDecimal;
@@ -112,6 +113,11 @@ public class SwapFileModel {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        
+        //Verifica se existe algum valor de troca
+        if(swaps.isEmpty()){
+            throw new ErrorIgnore("Nenhuma troca encontrada no arquivo de trocas.");
         }
     }
 

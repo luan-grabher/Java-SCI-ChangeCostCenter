@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Expense;
 import sci.changecostcenter.Model.Entity.Swap;
+import Entity.ErrorIgnore;
 
 public class ExpenseModel {
 
@@ -90,7 +91,7 @@ public class ExpenseModel {
         }
         
         if(expenses.isEmpty()){
-            throw new Error("Nenhuma despesa encontrada no arquivo de despesas");
+            throw new ErrorIgnore("Nenhuma despesa encontrada no arquivo de despesas.");
         }
     }
 
