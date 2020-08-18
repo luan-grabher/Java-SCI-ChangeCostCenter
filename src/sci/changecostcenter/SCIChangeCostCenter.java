@@ -31,7 +31,7 @@ public class SCIChangeCostCenter {
                     File swapsFile = Selector.Arquivo.selecionar("", "Arquivo de trocas CSV", "csv");
                     //Se arquivo existir, continua a execução, se não exibe erro
                     if (swapsFile.exists()) {
-                        JOptionPane.showMessageDialog(null, "Por favor escolha o arquivo de Despesas CSV:");
+                        JOptionPane.showMessageDialog(null, "Por favor escolha o arquivo de Despesas XLSX:");
                         File expensesFile = Selector.Arquivo.selecionar("", "Arquivo de Despesas XLSX", "xlsx");
                         
                         if(expensesFile.exists()){
@@ -58,6 +58,9 @@ public class SCIChangeCostCenter {
 
         try {
             Env.setPath("zampieron_change_cc");
+            if(Env.getEnvs().isEmpty()){
+                throw new Exception("Arquivo Env não encontrado ou vazio!");
+            }
 
             Controller controller = new Controller();
             controller.setReference(year + (month < 10 ? "0" : "") + month);
@@ -80,6 +83,7 @@ public class SCIChangeCostCenter {
         } catch (Exception e) {
             e.printStackTrace();
             str = "Erro interno no programa: " + e.getMessage();
+            JOptionPane.showMessageDialog(null, str, "Erro!", JOptionPane.ERROR_MESSAGE);
         }
 
         return str;
