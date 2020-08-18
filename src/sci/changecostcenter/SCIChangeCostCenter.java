@@ -85,7 +85,7 @@ public class SCIChangeCostCenter {
             
             
             if(!"".equals(log.toString())){
-                FileManager.save(new File(System.getProperty("user.dir")) + "\\Desktop\\log.txt", log.toString());
+                FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log.txt", log.toString());
                 JOptionPane.showMessageDialog(null, "Arquivo log.txt com LOG foi salvo na área de trabalho!");
             }
             

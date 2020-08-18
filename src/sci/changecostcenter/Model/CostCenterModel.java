@@ -32,29 +32,29 @@ public class CostCenterModel {
         variables.put("reference", reference);
 
         List<String[]> results = Database.getDatabase().select(new File("sql\\selectReferenceContabilityEntriesCostCenters.sql"), variables);
-        
+
         //TRansforma resultado em objetos
         for (String[] result : results) {
             //Inicia objeto
             CostCenterEntry entry = new CostCenterEntry();
-            
+
             entry.setKey(Integer.valueOf(result[1]));
             entry.setCostCenterPlan(Integer.valueOf(result[2]));
             entry.setCostCenter(Integer.valueOf(result[3]));
             entry.setValueType(Integer.valueOf(result[4]));
             entry.setValue(new BigDecimal(result[5]));
-            entry.setCreditAccount(result[6] == null?null:Integer.valueOf(result[6]));
-            entry.setDebitAccount(result[7] == null?null:Integer.valueOf(result[7]));
-            
+            entry.setCreditAccount(result[6] == null ? null : Integer.valueOf(result[6]));
+            entry.setDebitAccount(result[7] == null ? null : Integer.valueOf(result[7]));
+
             referenceCostCenters.add(entry);
         }
-        
+
         return referenceCostCenters;
     }
 
     public List<CostCenterEntry> getReferenceCostCenters() {
         return referenceCostCenters;
-    }        
+    }
 
     public List<ContabilityEntry> getContabilityEntriesWithoutCostCenter(String reference) {
         //Reset
@@ -137,7 +137,7 @@ public class CostCenterModel {
 
     private final String scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
     private final String scriptSqlSelectContabilityEntryCostCenterByKey = FileManager.getText(new File("sql\\selectContabilityEntryCostCenterByKey.sql"));
-        
+
     public void insertContabilityEntryCostCenter(CostCenterEntry entry) {
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
@@ -145,15 +145,14 @@ public class CostCenterModel {
         //Coloca chave nas trocas        
         variableChanges.put("key", entry.getKey().toString()); // Chave do lançamento
         variableChanges.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
-        
-        //Procura Aquela chave nos lançamentos de CC da empresa, se não existir, insere, se não, não insere
-        if(Database.getDatabase().select(scriptSqlSelectContabilityEntryCostCenterByKey, variableChanges).isEmpty()){
-            //coloca trocas
-            variableChanges.put("centerCostPlan", Env.get("changeCostCenterCenterCostPlan"));
-            variableChanges.put("value", entry.getValue().toString());
-            variableChanges.put("valueType", entry.getValueType().toString());
-            variableChanges.put("centerCost", entry.getCostCenter().toString());
+        variableChanges.put("centerCostPlan", Env.get("changeCostCenterCenterCostPlan"));
+        variableChanges.put("value", entry.getValue().toString());
+        variableChanges.put("valueType", entry.getValueType().toString());
+        variableChanges.put("centerCost", entry.getCostCenter().toString());
 
+        //Procura Aquela chave nos lançamentos de CC da empresa, se não existir, insere, se não, não insere
+        if (Database.getDatabase().select(scriptSqlSelectContabilityEntryCostCenterByKey, variableChanges).isEmpty()) {
+            //Tenta inserir
             boolean result = Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
 
             SCIChangeCostCenter.log
@@ -164,7 +163,7 @@ public class CostCenterModel {
                     .append(entry.getKey())
                     .append(": ")
                     .append(result);
-        }else{
+        } else {
             SCIChangeCostCenter.log
                     .append("\n")
                     .append("Já existe o centro de custo ")
@@ -172,8 +171,7 @@ public class CostCenterModel {
                     .append(" na chave ")
                     .append(entry.getKey());
         }
-        
-        
+
     }
 
     private final String scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
