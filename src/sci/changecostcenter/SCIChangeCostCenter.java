@@ -2,8 +2,8 @@ package sci.changecostcenter;
 
 import Entity.Executavel;
 import Executor.Execution;
-import Robo.AppRobo;
 import SimpleDotEnv.Env;
+import fileManager.FileManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import sci.changecostcenter.Control.Controller;
 
 public class SCIChangeCostCenter {
+    public static StringBuilder log = new StringBuilder("");
 
     public static void main(String[] args) {
         String name = "Zampieron trocar centros de custo ";
@@ -80,7 +81,13 @@ public class SCIChangeCostCenter {
             execution.setShowMessages(true);
             execution.setExecutables(execs);
             execution.runExecutables();
-            execution.endExecution(true);           
+            execution.endExecution(true);
+            
+            
+            if(!"".equals(log.toString())){
+                FileManager.save(new File(System.getProperty("user.home")) + "\\log.txt", log.toString());
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             str = "Erro interno no programa: " + e.getMessage();
