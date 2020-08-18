@@ -33,10 +33,10 @@ public class testMain {
 
         String name = "Teste";
 
-        File folder = new File("G:\\Contábil\\Clientes\\Zampieron & Dalallacorte\\Escrituração Mensal\\2020\\Movimento");
+        File folder = new File("C:\\Users\\ti01\\Downloads");
 
-        File swapsFile = new File(folder.getAbsolutePath() + "\\csv em branco.csv");
-        File expensesFile = new File(folder.getAbsolutePath() + "\\Despesas por Centros de Custos - Real até Julho20 (base vcto Real CPag de 05.08.20).xlsx");
+        File swapsFile = new File(folder.getAbsolutePath() + "\\branco.csv");
+        File expensesFile = new File(folder.getAbsolutePath() + "\\despesas.xlsx");
 
         System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
     }

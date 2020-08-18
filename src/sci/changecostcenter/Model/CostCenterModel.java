@@ -108,7 +108,7 @@ public class CostCenterModel {
     public void importCostCenterEntriesToDatabase() {
         for (Swap swap : swaps) {
             for (CostCenterEntry entry : swap.getEntries()) {
-                if (entry.getKey() != null && entry.getKey() != 0) {
+                if (entry.getKey() != null && entry.getKey() > 0 && entry.getCostCenter() != null && entry.getCostCenter() > 0) {
                     insertContabilityEntryCostCenter(entry);
                 }
             }

@@ -114,6 +114,10 @@ public class Controller {
         }
     }
 
+    /**
+     * Define as chaves dos lançamentos das trocas, depois define as trocas a
+     * serem realizadas no modelo do CC com as trocas do modelo de trocas.
+     **/
     public class getSwapList extends Executavel {
 
         public getSwapList() {
@@ -130,6 +134,9 @@ public class Controller {
 
     }
 
+    /**
+     * Importa as trocas para 
+     */
     public class importCostCenterEntriesToDatabase extends Executavel {
 
         public importCostCenterEntriesToDatabase() {

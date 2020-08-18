@@ -57,6 +57,7 @@ public class SCIChangeCostCenter {
         String str = "";
 
         try {
+            Env.setEncoding("utf-8");
             Env.setPath("zampieron_change_cc");
             if(Env.getEnvs().isEmpty()){
                 throw new Exception("Arquivo Env não encontrado ou vazio!");
