@@ -72,9 +72,9 @@ public class ExpenseModel {
                 expense.setDre(row.getCell(colDre).getStringCellValue());
                 expense.setExpenseDescription(row.getCell(colExpenseDescription).getStringCellValue());
                 expense.setCostCenterName(row.getCell(colCostCenterName).getStringCellValue());
-                expense.setNatureCode(row.getCell(colNatureCode) == null ? "" : row.getCell(colNatureCode).toString());
+                expense.setNatureCode(row.getCell(colNatureCode) == null ? "" : row.getCell(colNatureCode).toString().split("\\.")[0]);
                 expense.setNatureDescription(row.getCell(colNatureDescription).getStringCellValue());
-                expense.setProvider(row.getCell(colProvider).toString());
+                expense.setProvider(row.getCell(colProvider).toString().split("\\.")[0]);
                 expense.setProviderName(row.getCell(colProviderName).getStringCellValue());
 
                 expense.setValue(new BigDecimal(Double.toString(row.getCell(colValue).getNumericCellValue())));
@@ -96,11 +96,14 @@ public class ExpenseModel {
                     XSSFCell titleCell = row.getCell(colTitle);
 
                     if (titleCell != null) {
-                        expense.setTitle(titleCell.toString());
+                        expense.setTitle(titleCell.toString().split("\\.")[0]);
 
+                        //Verifica se aquela chave já tem lista, se nao tiver cria a lista
                         if (!expenses.containsKey(expense.getTitle())) {
                             expenses.put(expense.getTitle(), new ArrayList<>());
                         }
+                        
+                        //Adiciona a despesa na lista de trocas da nf
                         expenses.get(expense.getTitle()).add(expense);
                     } else {
                         log.append("\nLinha ").append(i + 1).append(" com NF não encontrada!");
