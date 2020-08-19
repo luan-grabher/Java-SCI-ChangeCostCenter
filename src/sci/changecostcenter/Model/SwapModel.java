@@ -57,7 +57,7 @@ public class SwapModel {
             if (swap.getFilter() != null) {
                 //Se tiver filtro
                 predicate = entriesDescriptionComplementFilter(swap.getFilter());
-                predicateString = "Complemento de Histórico que possua um dos termos: '" + swap.getFilter().getPossui() + "' e não possua nenhum dos termos: '" + swap.getFilter().getNaoPossui();
+                predicateString = "Complemento de Histórico que possua os termos: '" + swap.getFilter().getPossui() + "'";
             } else if (swap.getAccountCreditOrDebit() != null) {
                 //Se tiver conta de debito e credito
                 predicate = entriesAccount(swap.getAccountCreditOrDebit());
@@ -76,7 +76,7 @@ public class SwapModel {
             }
 
             try {
-                if(predicate != null){
+                if(predicate != null){                                                            
                     //Busca lançamento que possua o filtro no complemento
                     Optional<ContabilityEntry> optionalEntry = entries.stream().filter(predicate).findFirst();
                     if (optionalEntry.isPresent()) {
