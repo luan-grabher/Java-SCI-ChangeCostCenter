@@ -19,6 +19,7 @@ import sci.changecostcenter.Model.Entity.Swap;
 import Entity.ErrorIgnore;
 import Entity.Warning;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import static sci.changecostcenter.SCIChangeCostCenter.log;
 
 public class ExpenseModel {
 
@@ -32,8 +33,8 @@ public class ExpenseModel {
     public void setFile(File file) {
         this.file = file;
     }
-    
-    public void setExpenses(){
+
+    public void setExpenses() {
         defineWorkbook();
         getExpenseList();
     }
@@ -59,7 +60,7 @@ public class ExpenseModel {
         Integer colDate = JExcel.Cell(Env.get("coluna_Data"));
         Integer colDueDate = JExcel.Cell(Env.get("coluna_Data Pagamento"));
         Integer colTitle = JExcel.Cell(Env.get("coluna_Titulo"));
-        
+
         //Contagem de erros
         Integer errors = 0;
 
@@ -71,52 +72,62 @@ public class ExpenseModel {
                 expense.setDre(row.getCell(colDre).getStringCellValue());
                 expense.setExpenseDescription(row.getCell(colExpenseDescription).getStringCellValue());
                 expense.setCostCenterName(row.getCell(colCostCenterName).getStringCellValue());
-                expense.setNatureCode(row.getCell(colNatureCode) == null?"": row.getCell(colNatureCode).toString());
+                expense.setNatureCode(row.getCell(colNatureCode) == null ? "" : row.getCell(colNatureCode).toString());
                 expense.setNatureDescription(row.getCell(colNatureDescription).getStringCellValue());
                 expense.setProvider(row.getCell(colProvider).toString());
                 expense.setProviderName(row.getCell(colProviderName).getStringCellValue());
+
                 expense.setValue(new BigDecimal(Double.toString(row.getCell(colValue).getNumericCellValue())));
 
-                //Data
-                Calendar date = Calendar.getInstance();
-                date.setTime(row.getCell(colDate).getDateCellValue());
-                expense.setDate(date);
+                //Se valor encontrado for maior que zero, segue o codigo
+                if (expense.getValue().compareTo(BigDecimal.ZERO) == 1) {
 
-                //Data de pagamento
-                Calendar dueDate = Calendar.getInstance();
-                dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
-                expense.setDueDate(dueDate);
+                    //Data
+                    Calendar date = Calendar.getInstance();
+                    date.setTime(row.getCell(colDate).getDateCellValue());
+                    expense.setDate(date);
 
-                //Se a celula existir, pega String da celula
-                XSSFCell titleCell = row.getCell(colTitle);
-                
-                if(titleCell != null){
-                    expense.setTitle(titleCell.toString());
+                    //Data de pagamento
+                    Calendar dueDate = Calendar.getInstance();
+                    dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
+                    expense.setDueDate(dueDate);
 
-                    if (!expenses.containsKey(expense.getTitle())) {
-                        expenses.put(expense.getTitle(), new ArrayList<>());
+                    //Se a celula existir, pega String da celula
+                    XSSFCell titleCell = row.getCell(colTitle);
+
+                    if (titleCell != null) {
+                        expense.setTitle(titleCell.toString());
+
+                        if (!expenses.containsKey(expense.getTitle())) {
+                            expenses.put(expense.getTitle(), new ArrayList<>());
+                        }
+                        expenses.get(expense.getTitle()).add(expense);
+                    } else {
+                        log.append("\nLinha ").append(i + 1).append(" com NF não encontrada!");
+                        throw new Exception("Titulo(NF) inválido.");
                     }
-                    expenses.get(expense.getTitle()).add(expense);
                 }else{
-                    throw new Exception("Titulo(NF) inválido.");
+                    log.append("\nLinha ").append(i + 1).append(" com valor menor ou igual a 0.");
+                        throw new Exception("Valor inválido.");
                 }
             } catch (Exception e) {
                 errors++;
                 e.printStackTrace();
             }
         }
-        
-        if(errors > 0){
-            throw new Warning("Existem " + errors + " linhas com erros no arquivo de despesa que foram ignoradas de " + sheet.getLastRowNum()  + " linhas encontradas." );
+
+        if (errors > 0) {
+            throw new Warning("Existem " + errors + " linhas com erros no arquivo de despesa que foram ignoradas de " + sheet.getLastRowNum() + " linhas encontradas.");
         }
-        
-        if(expenses.isEmpty()){
+
+        if (expenses.isEmpty()) {
             throw new ErrorIgnore("Nenhuma despesa encontrada no arquivo de despesas.");
         }
     }
 
     /**
      * Get swap list from expenses of file
+     *
      * @return list of swaps of expenses of file
      */
     public List<Swap> getSwapList() {
@@ -142,22 +153,22 @@ public class ExpenseModel {
 
                     //Pega o número do centro de custo no ENV pelo nome
                     String costCenterEnv = Env.get("costCenterNumber_" + expense.getCostCenterName());
-                    if(costCenterEnv == null){
+                    if (costCenterEnv == null) {
                         throw new Error("Centro de custo '" + expense.getCostCenterName() + "' não encontrado no arquivo .ENV");
-                    }                    
+                    }
                     expense.setCostCenter(Integer.valueOf(costCenterEnv));
                     //Define o Centro de custo de débito da troca como o centro de custo
                     //O CC de credito irá ficar nulo
                     swap.setCostCenterDebit(expense.getCostCenter());
-                    
+
                     //Cria lista de entradas no banco
                     CostCenterEntry costCenterEntry = new CostCenterEntry(); //Instancia Entrada de Centro de Custo
                     costCenterEntry.setCostCenter(expense.getCostCenter()); //Define o centro de custo 
                     costCenterEntry.setValueType(CostCenterEntry.TYPE_DEBIT); // define o tipo do valor como debito
                     costCenterEntry.setValue(expense.getValue()); //define o valor
-                    
+
                     swap.getEntries().add(costCenterEntry); //Adiciona nas entradas da troca
-                    
+
                     //Adiciona Swap
                     swaps.add(swap);
                 } catch (Exception e) {

@@ -121,7 +121,7 @@ public class SwapFileModel {
 
         //Verifica se existe algum valor de troca
         if (swaps.isEmpty()) {
-            throw new ErrorIgnore("Nenhuma troca encontrada no arquivo de trocas.");
+            throw new ErrorIgnore("Nenhuma troca para ser feita encontrada no arquivo de trocas.");
         }
     }
 
