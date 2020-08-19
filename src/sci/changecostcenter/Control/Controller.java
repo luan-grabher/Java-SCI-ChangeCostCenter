@@ -118,9 +118,9 @@ public class Controller {
      * Define as chaves dos lançamentos das trocas, depois define as trocas a
      * serem realizadas no modelo do CC com as trocas do modelo de trocas.
      **/
-    public class getSwapList extends Executavel {
+    public class setSwapsToImport extends Executavel {
 
-        public getSwapList() {
+        public setSwapsToImport() {
             name = "Buscando lista de trocas";
         }
 
@@ -128,6 +128,23 @@ public class Controller {
         public void run() {
             //Set swaps
             swapModel.setKeysOfSwaps(costCenterModel.getContabilityEntries());
+            //Function to create a swap list
+            costCenterModel.setSwaps(swapModel.getSwaps());
+        }
+
+    }
+    
+     /**
+     * Define as trocas a serem realizadas no modelo do CC com as trocas do modelo de trocas.
+     **/
+    public class getKeysOfSwaps extends Executavel {
+
+        public getKeysOfSwaps() {
+            name = "Buscando lista de trocas";
+        }
+
+        @Override
+        public void run() {
             //Function to create a swap list
             costCenterModel.setSwaps(swapModel.getSwaps());
         }

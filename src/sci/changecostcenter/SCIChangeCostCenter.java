@@ -74,7 +74,8 @@ public class SCIChangeCostCenter {
             execs.add(controller.new getContabilityEntries());
             execs.add(controller.new setExpensesFile(expensesFile));
             execs.add(controller.new setSwapsFile(swapsFile));
-            execs.add(controller.new getSwapList());
+            execs.add(controller.new getKeysOfSwaps());
+            execs.add(controller.new setSwapsToImport());
             execs.add(controller.new importCostCenterEntriesToDatabase());
             
             Execution execution = new Execution(name);
