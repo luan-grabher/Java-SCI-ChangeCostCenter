@@ -49,6 +49,8 @@ public class ExpenseModel {
     }
 
     private void getExpenseList() {
+        FiltroString filterProviders = new FiltroString("", Env.get("ignorar_despesas_fornecedores"));
+
         Integer colDre = JExcel.Cell(Env.get("coluna_DRE"));
         Integer colExpenseDescription = JExcel.Cell(Env.get("coluna_Descrição Despesa"));
         Integer colCostCenterName = JExcel.Cell(Env.get("coluna_Nome CC"));
@@ -77,41 +79,45 @@ public class ExpenseModel {
                 expense.setProvider(row.getCell(colProvider).toString().split("\\.")[0]);
                 expense.setProviderName(row.getCell(colProviderName).getStringCellValue());
 
-                expense.setValue(new BigDecimal(Double.toString(row.getCell(colValue).getNumericCellValue())));
+                //Verifica se o fornecedor esta no filtro de fornecedores
+                if (filterProviders.éFiltroDaString(expense.getProviderName())) {
 
-                //Se valor encontrado for maior que zero, segue o codigo
-                if (expense.getValue().compareTo(BigDecimal.ZERO) == 1) {
+                    expense.setValue(new BigDecimal(Double.toString(row.getCell(colValue).getNumericCellValue())));
 
-                    //Data
-                    Calendar date = Calendar.getInstance();
-                    date.setTime(row.getCell(colDate).getDateCellValue());
-                    expense.setDate(date);
+                    //Se valor encontrado for maior que zero, segue o codigo
+                    if (expense.getValue().compareTo(BigDecimal.ZERO) == 1) {
 
-                    //Data de pagamento
-                    Calendar dueDate = Calendar.getInstance();
-                    dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
-                    expense.setDueDate(dueDate);
+                        //Data
+                        Calendar date = Calendar.getInstance();
+                        date.setTime(row.getCell(colDate).getDateCellValue());
+                        expense.setDate(date);
 
-                    //Se a celula existir, pega String da celula
-                    XSSFCell titleCell = row.getCell(colTitle);
+                        //Data de pagamento
+                        Calendar dueDate = Calendar.getInstance();
+                        dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
+                        expense.setDueDate(dueDate);
 
-                    if (titleCell != null) {
-                        expense.setTitle(titleCell.toString().split("\\.")[0]);
+                        //Se a celula existir, pega String da celula
+                        XSSFCell titleCell = row.getCell(colTitle);
 
-                        //Verifica se aquela chave já tem lista, se nao tiver cria a lista
-                        if (!expenses.containsKey(expense.getTitle())) {
-                            expenses.put(expense.getTitle(), new ArrayList<>());
+                        if (titleCell != null) {
+                            expense.setTitle(titleCell.toString().split("\\.")[0]);
+
+                            //Verifica se aquela chave já tem lista, se nao tiver cria a lista
+                            if (!expenses.containsKey(expense.getTitle())) {
+                                expenses.put(expense.getTitle(), new ArrayList<>());
+                            }
+
+                            //Adiciona a despesa na lista de trocas da nf
+                            expenses.get(expense.getTitle()).add(expense);
+                        } else {
+                            log.append("\nLinha ").append(i + 1).append(" com NF não encontrada!");
+                            throw new Exception("Titulo(NF) inválido.");
                         }
-                        
-                        //Adiciona a despesa na lista de trocas da nf
-                        expenses.get(expense.getTitle()).add(expense);
                     } else {
-                        log.append("\nLinha ").append(i + 1).append(" com NF não encontrada!");
-                        throw new Exception("Titulo(NF) inválido.");
-                    }
-                }else{
-                    log.append("\nLinha ").append(i + 1).append(" com valor menor ou igual a 0.");
+                        log.append("\nLinha ").append(i + 1).append(" com valor menor ou igual a 0.");
                         throw new Exception("Valor inválido.");
+                    }
                 }
             } catch (Exception e) {
                 errors++;
