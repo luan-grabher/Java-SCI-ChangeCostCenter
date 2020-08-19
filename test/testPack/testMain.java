@@ -35,8 +35,8 @@ public class testMain {
 
         File folder = new File("C:\\Users\\ti01\\Downloads");
 
-        File swapsFile = new File(folder.getAbsolutePath() + "\\branco.csv");
-        File expensesFile = new File(folder.getAbsolutePath() + "\\despesas.xlsx");
+        File swapsFile = new File(folder.getAbsolutePath() + "\\cc 072020.csv");
+        File expensesFile = new File(folder.getAbsolutePath() + "\\despesas ate 072020.xlsx");
 
         System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
     }

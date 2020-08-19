@@ -87,14 +87,19 @@ public class ExpenseModel {
                 dueDate.setTime(row.getCell(colDueDate).getDateCellValue());
                 expense.setDueDate(dueDate);
 
-                //
+                //Se a celula existir, pega String da celula
                 XSSFCell titleCell = row.getCell(colTitle);
-                expense.setTitle(titleCell == null?"":titleCell.toString());
+                
+                if(titleCell != null){
+                    expense.setTitle(titleCell.toString());
 
-                if (!expenses.containsKey(expense.getTitle())) {
-                    expenses.put(expense.getTitle(), new ArrayList<>());
+                    if (!expenses.containsKey(expense.getTitle())) {
+                        expenses.put(expense.getTitle(), new ArrayList<>());
+                    }
+                    expenses.get(expense.getTitle()).add(expense);
+                }else{
+                    throw new Exception("Titulo(NF) inválido.");
                 }
-                expenses.get(expense.getTitle()).add(expense);
             } catch (Exception e) {
                 errors++;
                 e.printStackTrace();
