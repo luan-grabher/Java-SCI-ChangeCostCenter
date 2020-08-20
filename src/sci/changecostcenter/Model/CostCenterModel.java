@@ -85,7 +85,7 @@ public class CostCenterModel {
         variables.put("reference", reference);
 
         //Get result from Db
-        List<String[]> results = Database.getDatabase().select(new File("sql\\selectContabilityEntriesWithoutCostCenter.sql"), variables);
+        List<String[]> results = Database.getDatabase().select(new File("sql\\selectReferenceContabilityEntries.sql"), variables);
 
         Integer enterpriseCode = Integer.valueOf(Env.get("changeCostCenterEnterpriseCode"));
 
@@ -104,6 +104,7 @@ public class CostCenterModel {
             entry.setDocument(result[9]);
             entry.setParticipantDebit(result[11] == null ? null : Integer.valueOf(result[11]));
             entry.setParticipantCredit(result[12] == null ? null : Integer.valueOf(result[12]));
+            entry.setCcCount(result[13] == null ? 0 : Integer.valueOf(result[13]));
 
             contabilityEntries.add(entry);
             //if((result[4]==null?0:Integer.valueOf(result[4])) == 265){

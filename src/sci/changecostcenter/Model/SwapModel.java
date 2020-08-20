@@ -4,7 +4,6 @@ import Entity.Warning;
 import Selector.Entity.FiltroString;
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +18,7 @@ public class SwapModel {
 
     private List<Swap> swaps = new ArrayList<>();
     private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
+    private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
 
     public List<CostCenterEntry> getReferenceCostCenters() {
         return referenceCostCenters;
@@ -49,6 +49,7 @@ public class SwapModel {
 
     public void setKeysOfSwaps(List<ContabilityEntry> entries) {
         Integer finds = 0;
+        contabilityEntries = entries;
 
         //Percorre trocas
         for (Swap swap : swaps) {
@@ -79,23 +80,24 @@ public class SwapModel {
 
             try {
                 if (predicate != null) {
-                    if(addKeyOfPredicateInSwapIfExists(swap, entries, predicate)){
+                    //Procura lcto daquele predicato
+                    if (findContabilityEntryKeyInSwap(swap, predicate)) {
                         finds++;
-                    }else {
+                    } else {
                         //Se tiver um filtro, valor e nf, ai irá tentar outra pesquisa
                         if (swap.getFilter() != null) {
                             //Se tiver filtro
                             predicate = entriesOfTitleAndValue(swap.getTitle(), swap.getValue());
                             predicateString = "Complemento de Histórico que possua: '" + swap.getTitle() + "' e tenha o valor de " + swap.getValue();
-                            
-                            if(addKeyOfPredicateInSwapIfExists(swap, entries, predicate)){
+
+                            if (findContabilityEntryKeyInSwap(swap, predicate)) {
                                 finds++;
-                            }else{
+                            } else {
                                 log.append("\nNenhum lançamento encontrado para a procura: ").append(predicateString);
                             }
-                        }else{
+                        } else {
                             log.append("\nNenhum lançamento encontrado para a procura: ").append(predicateString);
-                        }                       
+                        }
                     }
                 } else {
                     throw new Exception("Não foi possível encontrar lançamentos de contabilidade com os dados fornecidos.");
@@ -108,18 +110,36 @@ public class SwapModel {
         throw new Warning("Foram encontrados " + finds + " lançamentos contábeis das " + swaps.size() + " trocas que deveriam ser feitas.");
     }
 
-    private boolean addKeyOfPredicateInSwapIfExists(Swap swap, List<ContabilityEntry> entries, Predicate<ContabilityEntry> predicate) {
-        //Busca lançamento que possua o filtro no complemento
-        Optional<ContabilityEntry> optionalEntry = entries.stream().filter(predicate).findFirst();
-        if (optionalEntry.isPresent()) {
-            //Cria Objeto do lançamento
-            ContabilityEntry entry = optionalEntry.get();
+    private boolean findContabilityEntryKeyInSwap(Swap swap, Predicate<ContabilityEntry> predicate) {
+        //Procura lcto daquele predicato
+        ContabilityEntry contabilityEntry = getContabilityEntryOfPredicate(predicate);
 
-            //Pega o primeiro lançamento da troca e define a chave do lançamento
-            swap.getEntries().get(0).setKey(entry.getKey());
+        //Se encontrar um lcto para o predicato
+        if (contabilityEntry != null) {
+            //Se não tiver nenhum CC
+            if (contabilityEntry.getCcCount() == 0) {
+                //Adiciona chave no primeiro lcto das trocas
+                swap.getEntries().get(0).setKey(contabilityEntry.getKey());
+            } else {
+                log
+                        .append("\nA chave ")
+                        .append(contabilityEntry.getKey())
+                        .append(" já possui centro de custo. Complemento: ")
+                        .append(contabilityEntry.getDescriptionComplement());
+            }
             return true;
-        }else{
+        } else {
             return false;
+        }
+    }
+
+    private ContabilityEntry getContabilityEntryOfPredicate(Predicate<ContabilityEntry> predicate) {
+        //Busca lançamento que possua o filtro no complemento
+        Optional<ContabilityEntry> optionalEntry = contabilityEntries.stream().filter(predicate).findFirst();
+        if (optionalEntry.isPresent()) {
+            return optionalEntry.get();
+        } else {
+            return null;
         }
     }
 
