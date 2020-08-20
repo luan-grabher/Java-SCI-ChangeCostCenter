@@ -11,9 +11,14 @@ import javax.swing.JOptionPane;
 import sci.changecostcenter.Control.Controller;
 
 public class SCIChangeCostCenter {
+
     public static StringBuilder log = new StringBuilder("");
+    public static String envPath = "";
 
     public static void main(String[] args) {
+        //define path do env
+        envPath = args.length > 0 ? args[0] : "";
+
         String name = "Zampieron trocar centros de custo ";
 
         try {
@@ -34,11 +39,11 @@ public class SCIChangeCostCenter {
                     if (swapsFile.exists()) {
                         JOptionPane.showMessageDialog(null, "Por favor escolha o arquivo de Despesas XLSX:");
                         File expensesFile = Selector.Arquivo.selecionar("", "Arquivo de Despesas XLSX", "xlsx");
-                        
-                        if(expensesFile.exists()){
+
+                        if (expensesFile.exists()) {
                             //executa função principal
                             mainFunction(name, month, year, swapsFile, expensesFile);
-                        }else{
+                        } else {
                             JOptionPane.showMessageDialog(null, "Arquivo de Despesas inválido!", "Arquivo de Despesas inválido!", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
@@ -59,8 +64,10 @@ public class SCIChangeCostCenter {
 
         try {
             Env.setEncoding("utf-8");
-            Env.setPath("zampieron_change_cc");
-            if(Env.getEnvs().isEmpty()){
+            if (!envPath.equals("")) {
+                Env.setPath(envPath);
+            }
+            if (Env.getEnvs().isEmpty()) {
                 throw new Exception("Arquivo Env não encontrado ou vazio!");
             }
 
@@ -77,19 +84,18 @@ public class SCIChangeCostCenter {
             execs.add(controller.new getKeysOfSwaps());
             execs.add(controller.new setSwapsToImport());
             execs.add(controller.new importCostCenterEntriesToDatabase());
-            
+
             Execution execution = new Execution(name);
             execution.setShowMessages(true);
             execution.setExecutables(execs);
             execution.runExecutables();
             execution.endExecution(true);
-            
-            
-            if(!"".equals(log.toString())){
+
+            if (!"".equals(log.toString())) {
                 FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log.csv", log.toString());
                 JOptionPane.showMessageDialog(null, "Arquivo log.csv com LOG foi salvo na área de trabalho!");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             str = "Erro interno no programa: " + e.getMessage();
