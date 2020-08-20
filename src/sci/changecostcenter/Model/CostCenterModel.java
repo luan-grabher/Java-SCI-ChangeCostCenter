@@ -23,6 +23,13 @@ public class CostCenterModel {
 
     private List<Swap> swaps;
 
+    /**
+     * Pega CCs lançados na referência informada.
+     *
+     * @param reference Referência no banco Ex. 202007 para julho de 2020
+     * @return Uma lista com os CCs encontrados
+     *
+     */
     public List<CostCenterEntry> getReferenceCostCenterEntries(String reference) {
         //Reset
         referenceCostCenters = new ArrayList<>();
@@ -52,10 +59,23 @@ public class CostCenterModel {
         return referenceCostCenters;
     }
 
+    /**
+     * A lista de CCs lançados na referência que foi informada na outra função.
+     *
+     * @return Uma lista com os CCs encontrados
+     */
     public List<CostCenterEntry> getReferenceCostCenters() {
         return referenceCostCenters;
     }
 
+    /**
+     * Pega e define a Lista de lançamentos da referencia informada Que não
+     * possuam centro de custo
+     *
+     * @param reference Referência no banco Ex. 202007 para julho de 2020
+     * @return Lista de lançamentos da referencia informada Que não possuam
+     * centro de custo
+     */
     public List<ContabilityEntry> getContabilityEntriesWithoutCostCenter(String reference) {
         //Reset
         contabilityEntries = new ArrayList<>();
@@ -94,18 +114,38 @@ public class CostCenterModel {
         return contabilityEntries;
     }
 
+    /**
+     * Define a lista de trocas que serão feitas
+     *
+     * @param swaps Lista com as trocas que serão feitas
+     */
     public void setSwaps(List<Swap> swaps) {
         this.swaps = swaps;
     }
 
+    /**
+     * Pega lista de lançamentos que foram definidas anteriormente em outra
+     * função
+     *
+     * @return lista de lançamentos que foram definidas anteriormente em outra
+     * função
+     */
     public List<ContabilityEntry> getContabilityEntries() {
         return contabilityEntries;
     }
 
+    /**
+     * Define a lista de lançamentos conforme a lista informada.
+     *
+     * @param contabilityEntries Lista de lançamentos
+     */
     public void setContabilityEntries(List<ContabilityEntry> contabilityEntries) {
         this.contabilityEntries = contabilityEntries;
     }
 
+    /**
+     * Cria os CCs no banco de dados utilizando informações das trocas.
+     */
     public void importCostCenterEntriesToDatabase() {
         for (Swap swap : swaps) {
             for (CostCenterEntry entry : swap.getEntries()) {
@@ -116,8 +156,16 @@ public class CostCenterModel {
         }
     }
 
+    /* Define os textos que estão nos arquivos SQL */
     private final String scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
+    private final String scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
+    private final String scriptSqlSelectContabilityEntryCostCenterByKey = FileManager.getText(new File("sql\\selectContabilityEntryCostCenterByKey.sql"));
+    private final String scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
 
+    /**
+     * Insere lançamento contábil no banco
+     * @param entry Lançamento que será criado no banco
+     */
     public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
@@ -135,9 +183,10 @@ public class CostCenterModel {
         Database.getDatabase().query(scriptSqlInsertContabilityEntry, variableChanges);
     }
 
-    private final String scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
-    private final String scriptSqlSelectContabilityEntryCostCenterByKey = FileManager.getText(new File("sql\\selectContabilityEntryCostCenterByKey.sql"));
-
+    /**
+     * Insere Centro de Custo no banco
+     * @param entry CC a ser inserido.
+     */
     public void insertContabilityEntryCostCenter(CostCenterEntry entry) {
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
@@ -174,8 +223,10 @@ public class CostCenterModel {
 
     }
 
-    private final String scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
-
+    /**
+     * Retorna último chave inserida nos lançamentos contábeis.
+     * @return último chave inserida nos lançamentos contábeis.
+     */
     public Integer getLastContabilityEntryKey() {
         Map<String, String> variableChanges = new HashMap<>();
         variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
