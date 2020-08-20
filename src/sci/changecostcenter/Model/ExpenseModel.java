@@ -74,9 +74,9 @@ public class ExpenseModel {
                 expense.setDre(row.getCell(colDre).getStringCellValue());
                 expense.setExpenseDescription(row.getCell(colExpenseDescription).getStringCellValue());
                 expense.setCostCenterName(row.getCell(colCostCenterName).getStringCellValue());
-                expense.setNatureCode(row.getCell(colNatureCode) == null ? "" : row.getCell(colNatureCode).toString().split("\\.")[0]);
+                expense.setNatureCode(JExcel.getCellString(row.getCell(colNatureCode)));
                 expense.setNatureDescription(row.getCell(colNatureDescription).getStringCellValue());
-                expense.setProvider(row.getCell(colProvider).toString().split("\\.")[0]);
+                expense.setProvider(JExcel.getCellString(row.getCell(colProvider)));
                 expense.setProviderName(row.getCell(colProviderName).getStringCellValue());
 
                 //Verifica se o fornecedor esta no filtro de fornecedores
@@ -101,7 +101,11 @@ public class ExpenseModel {
                         XSSFCell titleCell = row.getCell(colTitle);
 
                         if (titleCell != null) {
-                            expense.setTitle(titleCell.toString().split("\\.")[0]);
+                            //Pega String da celula
+                            String titleCellString = JExcel.getCellString(titleCell);
+                            expense.setTitle(titleCellString);
+                            System.out.println("NF: " + titleCellString);                                                                                                        
+                            
 
                             //Verifica se aquela chave já tem lista, se nao tiver cria a lista
                             if (!expenses.containsKey(expense.getTitle())) {
@@ -159,7 +163,7 @@ public class ExpenseModel {
                     Swap swap = new Swap(); //Instancia troca
                     swap.setFilter(new FiltroString()); //Instancia filtro
                     swap.getFilter().setPossui(hasList); //Define o que o filtro deve possuir
-                    
+
                     //Para o filtro extra
                     swap.setValue(expense.getValue());
                     swap.setTitle(expense.getTitle());
