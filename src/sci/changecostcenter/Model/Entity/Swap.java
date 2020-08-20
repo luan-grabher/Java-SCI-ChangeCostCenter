@@ -2,6 +2,7 @@ package sci.changecostcenter.Model.Entity;
 
 import Selector.Entity.FiltroString;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Swap {
     }
 
     public void setValue(BigDecimal value) {
-        this.value = value;
+        this.value = value.setScale(2, RoundingMode.HALF_DOWN);
     }
 
     public Integer getAccountCreditOrDebit() {

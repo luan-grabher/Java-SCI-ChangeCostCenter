@@ -4,6 +4,7 @@ import Entity.Warning;
 import Selector.Entity.FiltroString;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -85,7 +86,7 @@ public class SwapModel {
                         if (swap.getFilter() != null) {
                             //Se tiver filtro
                             predicate = entriesOfTitleAndValue(swap.getTitle(), swap.getValue());
-                            predicateString = "Complemento de Histórico que possua: '" + swap.getTitle() + "' e tenha o valor de " + swap.getValue().setScale(2);
+                            predicateString = "Complemento de Histórico que possua: '" + swap.getTitle() + "' e tenha o valor de " + swap.getValue();
                             
                             if(addKeyOfPredicateInSwapIfExists(swap, entries, predicate)){
                                 finds++;
@@ -94,7 +95,7 @@ public class SwapModel {
                             }
                         }else{
                             log.append("\nNenhum lançamento encontrado para a procura: ").append(predicateString);
-                        }                        
+                        }                       
                     }
                 } else {
                     throw new Exception("Não foi possível encontrar lançamentos de contabilidade com os dados fornecidos.");
