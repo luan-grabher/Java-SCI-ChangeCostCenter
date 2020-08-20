@@ -14,12 +14,27 @@ public class Swap {
     private Integer participantDebit = null;
     private Integer descriptionCode = null;
     private FiltroString filter;
+    private String title = null;
+    private BigDecimal value = null;
 
     private List<CostCenterEntry> entries = new ArrayList<>();
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
 
-    public Swap() {
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public BigDecimal getValue() {
+        return value;
+    }
+
+    public void setValue(BigDecimal value) {
+        this.value = value;
     }
 
     public Integer getAccountCreditOrDebit() {
@@ -28,7 +43,7 @@ public class Swap {
 
     public void setAccountCreditOrDebit(Integer accountCreditOrDebit) {
         this.accountCreditOrDebit = accountCreditOrDebit;
-    }       
+    }
 
     public Integer getAccountCredit() {
         return accountCredit;
@@ -84,7 +99,7 @@ public class Swap {
 
     public void setCostCenterDebit(Integer costCenterDebit) {
         this.costCenterDebit = costCenterDebit;
-    }    
+    }
 
     public FiltroString getFilter() {
         return filter;
