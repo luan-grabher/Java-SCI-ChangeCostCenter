@@ -103,9 +103,7 @@ public class ExpenseModel {
                         if (titleCell != null) {
                             //Pega String da celula
                             String titleCellString = JExcel.getCellString(titleCell);
-                            expense.setTitle(titleCellString);
-                            System.out.println("NF: " + titleCellString);                                                                                                        
-                            
+                            expense.setTitle(titleCellString);                            
 
                             //Verifica se aquela chave já tem lista, se nao tiver cria a lista
                             if (!expenses.containsKey(expense.getTitle())) {
