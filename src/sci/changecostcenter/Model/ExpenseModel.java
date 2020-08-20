@@ -153,12 +153,16 @@ public class ExpenseModel {
                     //Adiciona no filtro
                     List<String> hasList = new ArrayList<>();
                     hasList.add(expense.getProviderName()); //Deve possuir o nome do fornecedor
-                    hasList.add(expense.getTitle()); //deve possuir o título (NF)
+                    hasList.add(expense.getTitle()); //deve possuir o título (NF)                                        
 
                     //Cria troca
                     Swap swap = new Swap(); //Instancia troca
                     swap.setFilter(new FiltroString()); //Instancia filtro
                     swap.getFilter().setPossui(hasList); //Define o que o filtro deve possuir
+                    
+                    //Para o filtro extra
+                    swap.setValue(expense.getValue());
+                    swap.setTitle(expense.getTitle());
 
                     //Pega o número do centro de custo no ENV pelo nome
                     String costCenterEnv = Env.get("costCenterNumber_" + expense.getCostCenterName());
