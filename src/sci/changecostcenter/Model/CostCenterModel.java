@@ -76,7 +76,7 @@ public class CostCenterModel {
      * @return Lista de lançamentos da referencia informada Que não possuam
      * centro de custo
      */
-    public List<ContabilityEntry> getContabilityEntriesWithoutCostCenter(String reference) {
+    public List<ContabilityEntry> getReferenceContabilityEntries(String reference) {
         //Reset
         contabilityEntries = new ArrayList<>();
 

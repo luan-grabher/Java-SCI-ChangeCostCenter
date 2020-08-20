@@ -57,7 +57,7 @@ public class Controller {
 
         @Override
         public void run() {
-            costCenterModel.getContabilityEntriesWithoutCostCenter(reference);
+            costCenterModel.getReferenceContabilityEntries(reference);
         }
     }
     

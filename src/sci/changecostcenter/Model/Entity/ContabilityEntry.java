@@ -28,6 +28,16 @@ public class ContabilityEntry {
     
     private Integer entryType = 0;
     
+    private Integer ccCount = 0;
+
+    public Integer getCcCount() {
+        return ccCount;
+    }
+
+    public void setCcCount(Integer ccCount) {
+        this.ccCount = ccCount;
+    }        
+    
     public ContabilityEntry copy(){
         ContabilityEntry entry = new ContabilityEntry();
         entry.setKey(key);
@@ -48,6 +58,7 @@ public class ContabilityEntry {
         entry.setCostCenterCredit(costCenterCredit);
         entry.setCostCenterDebit(costCenterDebit);
         entry.setEntryType(entryType);
+        entry.setCcCount(ccCount);
         
         return entry;
     }
