@@ -69,7 +69,7 @@ public class SCIChangeCostCenter {
             }
             if (Env.getEnvs().isEmpty()) {
                 throw new Exception("Arquivo Env não encontrado ou vazio!");
-            }
+            }            
 
             Controller controller = new Controller();
             controller.setReference(year + (month < 10 ? "0" : "") + month);

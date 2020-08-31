@@ -33,7 +33,7 @@ public class testMain {
 
         String name = "Teste";
 
-        File folder = new File("C:\\Users\\ti01\\Downloads");
+        File folder = new File("C:\\Users\\ti01\\Documents");
 
         File swapsFile = new File(folder.getAbsolutePath() + "\\cc 072020.csv");
         File expensesFile = new File(folder.getAbsolutePath() + "\\despesas ate 072020.xlsx");
