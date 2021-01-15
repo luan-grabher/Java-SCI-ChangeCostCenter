@@ -121,7 +121,15 @@ public class SwapModel {
         });
     }
 
+    /**
+     * Busca lançamentos das trocas definidas
+     * 
+     * @param sqlSwaps Mapa de trocas SQL
+     */
     private static Map<String, String> getEntries(Map<String, String> sqlSwaps) {
+        
+        
+        
         return null;
     }
 }
