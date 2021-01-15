@@ -1,0 +1,1 @@
+DELETE FROM VSUC_EMPRESAS_TLCC CC WHERE CC.BDCODEMP = :enterprise AND  :inClause /* -- cc.BDCHAVE */

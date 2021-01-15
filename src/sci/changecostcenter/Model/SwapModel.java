@@ -1,165 +1,127 @@
 package sci.changecostcenter.Model;
 
 import Entity.Warning;
-import Selector.Entity.FiltroString;
-import java.io.File;
-import java.math.BigDecimal;
+import fileManager.StringFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
-import sci.changecostcenter.Model.Entity.ContabilityEntry;
-import sci.changecostcenter.Model.Entity.CostCenterEntry;
+import java.util.Map;
 import sci.changecostcenter.Model.Entity.Swap;
 import static sci.changecostcenter.SCIChangeCostCenter.log;
+import static sci.changecostcenter.SCIChangeCostCenter.ini;
 
 public class SwapModel {
 
-    private List<Swap> swaps = new ArrayList<>();
-    private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
-    private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
+    /**
+     * Recebe as trocas na sua lista de trocas. Percorre trocas e cria cc no
+     * banco. Faz call para CC Model para importar para o banco.
+     */
+    private static List<Swap> swaps = new ArrayList<>();
 
-    public List<CostCenterEntry> getReferenceCostCenters() {
-        return referenceCostCenters;
-    }
-
-    public void setReferenceCostCenters(List<CostCenterEntry> referenceCostCenters) {
-        this.referenceCostCenters = referenceCostCenters;
-    }
-
-    public List<Swap> getSwaps() {
+    public static List<Swap> getSwaps() {
         return swaps;
     }
 
-    public void importExpenseSwaps(File file) {
-        ExpenseModel model = new ExpenseModel();
-        model.setFile(file);
-        model.setExpenses();
-        swaps.addAll(model.getSwapList());
+    public static void addSwap(Swap swap) {
+        swaps.add(swap);
     }
 
-    public void importSwapFileSwaps(File file) {
-        SwapFileModel model = new SwapFileModel();
-        model.setFile(file);
-        model.setReferenceCostCenters(referenceCostCenters);
-        model.setSwaps();
-        swaps.addAll(model.getSwaps());
-    }
+    public static void setKeysOfSwaps() {
+        swaps.forEach((swap) -> {
+            Map<String, String> usedFilter = new HashMap<>();
 
-    public void setKeysOfSwaps(List<ContabilityEntry> entries) {
-        Integer finds = 0;
-        contabilityEntries = entries;
+            Map<String, String> sqlSwaps = new HashMap<>();
+            sqlSwaps.put("enterprise", swap.getEnterprise().toString());//Empresa
+            sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
+            sqlSwaps.put("complement", "");//Plano Centro de Custo
 
-        //Percorre trocas
-        for (Swap swap : swaps) {
-            //Define predicado
-            Predicate predicate;
-            String predicateString = "";
+            if (swap.getComplementFilter() != null) {//Filtro para o complemento
+                //Cria variavel local
+                StringFilter complementfilter = swap.getComplementFilter();
 
-            if (swap.getFilter() != null) {
-                //Se tiver filtro
-                predicate = entriesOfDescriptionComplementFilter(swap.getFilter());
-                predicateString = "Complemento de Histórico que possua os termos: '" + swap.getFilter().getPossui() + "'";
+                //Mostra o filtro usado
+                String hasFilter = "Complemento de Histórico que possua os termos: '"
+                        + complementfilter.printMap(complementfilter.getHas(), ", ") + "'";
+                String hasNotFilter = "Complemento de Histórico que NÃO possua os termos: '"
+                        + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'";
+                usedFilter.put(hasFilter, hasFilter);
+                usedFilter.put(hasNotFilter, hasNotFilter);
+
+                //Adicionar no complemento um AND para cada has e um AND para cada hasNot                                  
+                StringBuilder sqlSwap = new StringBuilder();
+                complementfilter.getHas().forEach((h, has) -> {
+                    sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
+                });
+                complementfilter.getHas().forEach((hn, hasNot) -> {
+                    sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
+                });
+
+                sqlSwaps.put("complement", sqlSwap.toString());
             } else if (swap.getAccountCreditOrDebit() != null) {
-                //Se tiver conta de debito e credito
-                predicate = entriesOfAccount(swap.getAccountCreditOrDebit());
-                predicateString = "Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit();
+                //Mostra filtro usado
+                String filter = "Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit();
+                usedFilter.put(filter, filter);
+                //Filtro sql
+                StringBuilder sqlSwap = new StringBuilder();
+                sqlSwap
+                        .append(" AND (BDDEBITO = ")
+                        .append(swap.getAccountCreditOrDebit())
+                        .append(" OR BDCREDITO = ")
+                        .append(swap.getAccountCreditOrDebit())
+                        .append(")");
+
+                sqlSwaps.put("account", sqlSwap.toString());
             } else if (swap.getAccountCredit() != null) {
-                //Se tiver conta de credito
-                predicate = entriesOfCreditAccount(swap.getAccountCredit());
-                predicateString = "Conta de crédito igual a: " + swap.getAccountCredit();
+                //Mostra filtro usado
+                String filter = "Conta de crédito igual a: " + swap.getAccountCredit();
+                usedFilter.put(filter, filter);
+                //Filtro sql
+                StringBuilder sqlSwap = new StringBuilder();
+                sqlSwap
+                        .append(" AND BDCREDITO = ")
+                        .append(swap.getAccountCredit());
+
+                sqlSwaps.put("account", sqlSwap.toString());
             } else if (swap.getAccountDebit() != null) {
-                //Se tiver conta de debito
-                predicate = entriesOfDebitAccount(swap.getAccountDebit());
-                predicateString = "Conta de débito igual a: " + swap.getAccountDebit();
-            } else {
-                //Se nenhuma das opções
-                predicate = null;
+                //Mostra filtro usado
+                String filter = "Conta de débito igual a: " + swap.getAccountDebit();
+                usedFilter.put(filter, filter);
+                //Filtro sql
+                StringBuilder sqlSwap = new StringBuilder();
+                sqlSwap
+                        .append(" AND BDCREDITO = ")
+                        .append(swap.getAccountDebit());
+
+                sqlSwaps.put("account", sqlSwap.toString());
             }
 
-            try {
-                if (predicate != null) {
-                    //Procura lcto daquele predicato
-                    if (findContabilityEntryKeyInSwap(swap, predicate)) {
-                        finds++;
-                    } else {
-                        //Se tiver um filtro, valor e nf, ai irá tentar outra pesquisa
-                        if (swap.getFilter() != null) {
-                            //Se tiver filtro
-                            predicate = entriesOfTitleAndValue(swap.getTitle(), swap.getValue());
-                            predicateString = "Complemento de Histórico que possua: '" + swap.getTitle() + "' e tenha o valor de " + swap.getValue();
-
-                            if (findContabilityEntryKeyInSwap(swap, predicate)) {
-                                finds++;
-                            } else {
-                                log.append("\nNenhum lançamento encontrado para a procura: ").append(predicateString);
-                            }
-                        } else {
-                            log.append("\nNenhum lançamento encontrado para a procura: ").append(predicateString);
-                        }
-                    }
-                } else {
-                    throw new Exception("Não foi possível encontrar lançamentos de contabilidade com os dados fornecidos.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        throw new Warning("Foram encontrados " + finds + " lançamentos contábeis das " + swaps.size() + " trocas que deveriam ser feitas.");
+            //Cria variavel de lctos
+            //Procura lctos
+            //
+            //Se não encontrar nenhum lcto
+            //****Se tiver um filtro de complemento, valor e nf
+            //********Define o sqlSwap complement para o titulo(documento)
+            //********Define o sqlSwap value para o valor
+            //********Procura Lctos
+            //********Se encontrar lctos
+            //************Define a variavel de lctos os lctos
+            //Se encontrar lctos
+            //****Define a variavel de lctos os lctos
+            //
+            //
+            //Se existirem lctos na variavel de lctos
+            //****Adiciona CCs no mapa de CCs que serão inseridos
+            //Se não existirem lctos na variavel de lctos
+            //****Mostra no log que não foi encontrado lctos para aquele filtro
+            //
+            //
+            //
+            //"Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValue();
+            //log.append("\nNenhum lançamento encontrado para a procura: ").append(usedFilter);
+        });
     }
 
-    private boolean findContabilityEntryKeyInSwap(Swap swap, Predicate<ContabilityEntry> predicate) {
-        //Procura lcto daquele predicato
-        ContabilityEntry contabilityEntry = getContabilityEntryOfPredicate(predicate);
-
-        //Se encontrar um lcto para o predicato
-        if (contabilityEntry != null) {
-            //Se não tiver nenhum CC
-            if (contabilityEntry.getCcCount() == 0) {
-                //Adiciona chave no primeiro lcto das trocas
-                swap.getEntries().get(0).setKey(contabilityEntry.getKey());
-            } else {
-                log
-                        .append("\nA chave ")
-                        .append(contabilityEntry.getKey())
-                        .append(" já possui centro de custo. Complemento: ")
-                        .append(contabilityEntry.getDescriptionComplement());
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private ContabilityEntry getContabilityEntryOfPredicate(Predicate<ContabilityEntry> predicate) {
-        //Busca lançamento que possua o filtro no complemento
-        Optional<ContabilityEntry> optionalEntry = contabilityEntries.stream().filter(predicate).findFirst();
-        if (optionalEntry.isPresent()) {
-            return optionalEntry.get();
-        } else {
-            return null;
-        }
-    }
-
-    private Predicate<ContabilityEntry> entriesOfTitleAndValue(String title, BigDecimal value) {
-        return e -> e.getDescriptionComplement().contains(title) && e.getValue().compareTo(value) == 0;
-    }
-
-    private Predicate<ContabilityEntry> entriesOfDescriptionComplementFilter(FiltroString filter) {
-        return e -> filter.éFiltroDaString(e.getDescriptionComplement());
-    }
-
-    private Predicate<ContabilityEntry> entriesOfAccount(Integer account) {
-        return entriesOfDebitAccount(account).or(entriesOfCreditAccount(account));
-    }
-
-    private Predicate<ContabilityEntry> entriesOfDebitAccount(Integer account) {
-        return e -> Objects.equals(e.getAccountDebit(), account);
-    }
-
-    private Predicate<ContabilityEntry> entriesOfCreditAccount(Integer account) {
-        return e -> Objects.equals(e.getAccountCredit(), account);
+    private static Map<String, String> getEntries(Map<String, String> sqlSwaps) {
+        return null;
     }
 }

@@ -1,7 +1,6 @@
 package sci.changecostcenter.Model;
 
 import Dates.Dates;
-import SimpleDotEnv.Env;
 import fileManager.FileManager;
 import java.io.File;
 import java.math.BigDecimal;
@@ -20,6 +19,9 @@ public class CostCenterModel {
 
     private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
     private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
+    
+    private final String enterprise = SCIChangeCostCenter.ini.get("Config", "enterprise");
+    private final String costCenterPlan = SCIChangeCostCenter.ini.get("Config", "costCenterPlan");
 
     private List<Swap> swaps;
 
@@ -35,7 +37,7 @@ public class CostCenterModel {
         referenceCostCenters = new ArrayList<>();
 
         Map<String, String> variables = new HashMap<>();
-        variables.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
+        variables.put("enterpriseCode", enterprise);
         variables.put("reference", reference);
 
         List<String[]> results = Database.getDatabase().select(new File("sql\\selectReferenceContabilityEntriesCostCenters.sql"), variables);
@@ -46,7 +48,7 @@ public class CostCenterModel {
             CostCenterEntry entry = new CostCenterEntry();
 
             entry.setKey(Integer.valueOf(result[1]));
-            entry.setCostCenterPlan(Integer.valueOf(result[2]));
+            entry.setCenterCostPlan(Integer.valueOf(result[2]));
             entry.setCostCenter(Integer.valueOf(result[3]));
             entry.setValueType(Integer.valueOf(result[4]));
             entry.setValue(new BigDecimal(result[5]));
@@ -81,13 +83,13 @@ public class CostCenterModel {
         contabilityEntries = new ArrayList<>();
 
         Map<String, String> variables = new HashMap<>();
-        variables.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
+        variables.put("enterpriseCode", enterprise);
         variables.put("reference", reference);
 
         //Get result from Db
         List<String[]> results = Database.getDatabase().select(new File("sql\\selectReferenceContabilityEntries.sql"), variables);
 
-        Integer enterpriseCode = Integer.valueOf(Env.get("changeCostCenterEnterpriseCode"));
+        Integer enterpriseCode = Integer.valueOf(enterprise);
 
         //PErcorre resultados
         for (String[] result : results) {
@@ -158,31 +160,8 @@ public class CostCenterModel {
     }
 
     /* Define os textos que estão nos arquivos SQL */
-    private final String scriptSqlInsertContabilityEntry = FileManager.getText(new File("sql\\insertContabilityEntry.sql"));
     private final String scriptSqlInsertContabilityEntryCostCenter = FileManager.getText(new File("sql\\insertContabilityEntryCostCenter.sql"));
     private final String scriptSqlSelectContabilityEntryCostCenterByKey = FileManager.getText(new File("sql\\selectContabilityEntryCostCenterByKey.sql"));
-    private final String scriptSqlGetLastContabilityEntryKey = FileManager.getText(new File("sql\\selectLastContabilityEntryKey.sql"));
-
-    /**
-     * Insere lançamento contábil no banco
-     * @param entry Lançamento que será criado no banco
-     */
-    public void insertContabilityEntryOnDatabase(ContabilityEntry entry) {
-        //Cria variavel de trocas
-        Map<String, String> variableChanges = new HashMap<>();
-
-        variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
-        variableChanges.put("accountDebit", entry.getAccountDebit() + ""); //reverse account to reverse values on database
-        variableChanges.put("accountCredit", entry.getAccountCredit() + ""); //reverse account to reverse values on database
-        variableChanges.put("date", new SimpleDateFormat("yyyy-mm-dd", Dates.BRAZIL).format(entry.getDate().getTime()));
-        variableChanges.put("value", entry.getValue().toString());
-        variableChanges.put("descriptionComplement", entry.getDescriptionComplement());
-        variableChanges.put("document", entry.getDocument());
-        variableChanges.put("participantDebit", entry.getParticipantDebit() + "");
-        variableChanges.put("participantCredit", entry.getParticipantCredit() + "");
-
-        Database.getDatabase().query(scriptSqlInsertContabilityEntry, variableChanges);
-    }
 
     /**
      * Insere Centro de Custo no banco
@@ -194,8 +173,8 @@ public class CostCenterModel {
 
         //Coloca chave nas trocas        
         variableChanges.put("key", entry.getKey().toString()); // Chave do lançamento
-        variableChanges.put("enterpriseCode", Env.get("changeCostCenterEnterpriseCode"));
-        variableChanges.put("centerCostPlan", Env.get("changeCostCenterCenterCostPlan"));
+        variableChanges.put("enterpriseCode", enterprise);
+        variableChanges.put("centerCostPlan", costCenterPlan);
         variableChanges.put("value", entry.getValue().toString());
         variableChanges.put("valueType", entry.getValueType().toString());
         variableChanges.put("centerCost", entry.getCostCenter().toString());
@@ -203,7 +182,7 @@ public class CostCenterModel {
         //Procura Aquela chave nos lançamentos de CC da empresa, se não existir, insere, se não, não insere
         if (Database.getDatabase().select(scriptSqlSelectContabilityEntryCostCenterByKey, variableChanges).isEmpty()) {
             //Tenta inserir
-            boolean result = Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
+            boolean result = true ;//Database.getDatabase().query(scriptSqlInsertContabilityEntryCostCenter, variableChanges);
 
             SCIChangeCostCenter.log
                     .append("\n")
@@ -222,22 +201,5 @@ public class CostCenterModel {
                     .append(entry.getKey());
         }
 
-    }
-
-    /**
-     * Retorna último chave inserida nos lançamentos contábeis.
-     * @return último chave inserida nos lançamentos contábeis.
-     */
-    public Integer getLastContabilityEntryKey() {
-        Map<String, String> variableChanges = new HashMap<>();
-        variableChanges.put("enterpriseCode", Env.get("enterpriseCode"));
-
-        ArrayList<String[]> results = Database.getDatabase().select(scriptSqlGetLastContabilityEntryKey, variableChanges);
-
-        if (!results.isEmpty()) {
-            return Integer.valueOf(results.get(0)[0]);
-        } else {
-            return 0;
-        }
     }
 }

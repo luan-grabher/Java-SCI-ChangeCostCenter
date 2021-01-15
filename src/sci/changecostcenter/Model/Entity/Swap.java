@@ -1,33 +1,63 @@
 package sci.changecostcenter.Model.Entity;
 
-import Selector.Entity.FiltroString;
+import fileManager.StringFilter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
+import static sci.changecostcenter.SCIChangeCostCenter.ini;
 
 public class Swap {
 
+    //Filtros
+    private Integer enterprise = Integer.valueOf(ini.get("Config", "enterprise"));
     private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;
     private Integer participantCredit = null;
     private Integer participantDebit = null;
     private Integer descriptionCode = null;
-    private FiltroString filter;
-    private String title = null;
-    private BigDecimal value = null;
+    private StringFilter complementFilter = null;
+    private String document = null;
+    private BigDecimal valueFilter = null;
 
-    private List<CostCenterEntry> entries = new ArrayList<>();
+    //Inserts
+    private BigDecimal value = null;
+    private BigDecimal percent = null;
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
 
-    public String getTitle() {
-        return title;
+    /*
+     * ***********************************************************************
+     */
+    public void setValueFilter(BigDecimal valueFilter) {
+        this.valueFilter = valueFilter;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public BigDecimal getValueFilter() {
+        return valueFilter;
+    }
+
+    public Integer getEnterprise() {
+        return enterprise;
+    }
+
+    public void setEnterprise(Integer enterprise) {
+        this.enterprise = enterprise;
+    }
+
+    public BigDecimal getPercent() {
+        return percent;
+    }
+
+    public void setPercent(BigDecimal percent) {
+        this.percent = percent;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
     }
 
     public BigDecimal getValue() {
@@ -102,28 +132,11 @@ public class Swap {
         this.costCenterDebit = costCenterDebit;
     }
 
-    public FiltroString getFilter() {
-        return filter;
+    public StringFilter getComplementFilter() {
+        return complementFilter;
     }
 
-    public void setFilter(FiltroString filter) {
-        this.filter = filter;
-    }
-
-    public List<CostCenterEntry> getEntries() {
-        return entries;
-    }
-
-    public void setEntries(List<CostCenterEntry> entries) {
-        this.entries = entries;
-    }
-
-    public BigDecimal getTotalValue() {
-        BigDecimal total = new BigDecimal(0);
-        for (CostCenterEntry entry : entries) {
-            total.add(entry.getValue());
-        }
-
-        return total;
+    public void setComplementFilter(StringFilter complementFilter) {
+        this.complementFilter = complementFilter;
     }
 }

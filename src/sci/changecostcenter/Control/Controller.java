@@ -1,10 +1,10 @@
 package sci.changecostcenter.Control;
 
 import Entity.Executavel;
-import SimpleDotEnv.Env;
 import java.io.File;
 import sci.changecostcenter.Model.CostCenterModel;
 import sci.changecostcenter.Model.SwapModel;
+import sci.changecostcenter.SCIChangeCostCenter;
 import sql.Database;
 
 public class Controller {
@@ -26,14 +26,9 @@ public class Controller {
      * Define Database estático conforme local definido no arquivo ENV
      */
     public class defineDatabase extends Executavel {
-
-        public defineDatabase() {
-            name = "Definindo banco de dados...";
-        }
-
         @Override
         public void run() {
-            File databseConfigFile = new File(Env.get("databaseCfgFilePath"));
+            File databseConfigFile = new File(SCIChangeCostCenter.ini.get("Config","databaseCfgFilePath"));
 
             if (databseConfigFile.exists()) {
                 Database.setStaticObject(new Database(databseConfigFile));
@@ -45,15 +40,24 @@ public class Controller {
             }
         }
     }
+    
+    /**
+     * Apaga todos os centros de custos do período
+     * 
+     */
+    public class deleteReferenceCCs extends Executavel {
+
+        @Override
+        public void run() {
+            
+        }
+        
+    }
 
     /**
      * Cria lista de lançamentos que não tem centro de custo naquela referência
      */
     public class getContabilityEntries extends Executavel {
-
-        public getContabilityEntries() {
-            name = "Buscando lançamentos contábeis sem centro de custo";
-        }
 
         @Override
         public void run() {
@@ -65,10 +69,6 @@ public class Controller {
      * Cria lista de Centros de custo dos lançamentos do mês da referência
      */
     public class getReferenceCostCenters extends Executavel{
-
-        public getReferenceCostCenters() {
-            name = "Buscando centros de custo da referência " + reference;
-        }
 
         @Override
         public void run() {
@@ -86,7 +86,6 @@ public class Controller {
         private final File file;
 
         public setExpensesFile(File file) {
-            name = "Definindo arquivo de despesas";
             this.file = file;
         }
 
@@ -104,13 +103,13 @@ public class Controller {
         private final File file;
 
         public setSwapsFile(File file) {
-            name = "Definindo arquivo de trocas";
             this.file = file;
         }
 
         @Override
         public void run() {
             swapModel.importSwapFileSwaps(file);
+            costCenterModel.setSwaps(swapModel.getSwaps());
         }
     }
 
@@ -119,10 +118,6 @@ public class Controller {
      * serem realizadas no modelo do CC com as trocas do modelo de trocas.
      **/
     public class setSwapsToImport extends Executavel {
-
-        public setSwapsToImport() {
-            name = "Buscando lista de trocas";
-        }
 
         @Override
         public void run() {
@@ -133,32 +128,11 @@ public class Controller {
         }
 
     }
-    
-     /**
-     * Define as trocas a serem realizadas no modelo do CC com as trocas do modelo de trocas.
-     **/
-    public class getKeysOfSwaps extends Executavel {
-
-        public getKeysOfSwaps() {
-            name = "Buscando lista de trocas";
-        }
-
-        @Override
-        public void run() {
-            //Function to create a swap list
-            costCenterModel.setSwaps(swapModel.getSwaps());
-        }
-
-    }
 
     /**
      * Importa as trocas para 
      */
     public class importCostCenterEntriesToDatabase extends Executavel {
-
-        public importCostCenterEntriesToDatabase() {
-            name = "Importando centros de custos dos lançamentos para o banco de dados";
-        }
 
         @Override
         public void run() {

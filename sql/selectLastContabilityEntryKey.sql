@@ -1,1 +1,0 @@
-select coalesce((max(BDCHAVE)), 1) from vsuc_empresas_tlan where bdcodemp = :enterpriseCode
