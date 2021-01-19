@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import sci.changecostcenter.Model.Entity.ContabilityEntry;
-import sci.changecostcenter.Model.Entity.CostCenterEntry;
+import sci.changecostcenter.Model.Entity.CostCenter;
 import sci.changecostcenter.Model.Entity.Swap;
 import sci.changecostcenter.SCIChangeCostCenter;
 import sql.Database;
@@ -18,7 +18,7 @@ import sql.Database;
 public class CostCenterModel {
 
     private List<ContabilityEntry> contabilityEntries = new ArrayList<>();
-    private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
+    private List<CostCenter> referenceCostCenters = new ArrayList<>();
     
     private final String enterprise = SCIChangeCostCenter.ini.get("Config", "enterprise");
     private final String costCenterPlan = SCIChangeCostCenter.ini.get("Config", "costCenterPlan");
@@ -32,7 +32,7 @@ public class CostCenterModel {
      * @return Uma lista com os CCs encontrados
      *
      */
-    public List<CostCenterEntry> getReferenceCostCenterEntries(String reference) {
+    public List<CostCenter> getReferenceCostCenterEntries(String reference) {
         //Reset
         referenceCostCenters = new ArrayList<>();
 
@@ -45,7 +45,7 @@ public class CostCenterModel {
         //TRansforma resultado em objetos
         for (String[] result : results) {
             //Inicia objeto
-            CostCenterEntry entry = new CostCenterEntry();
+            CostCenter entry = new CostCenter();
 
             entry.setKey(Integer.valueOf(result[1]));
             entry.setCenterCostPlan(Integer.valueOf(result[2]));
@@ -66,7 +66,7 @@ public class CostCenterModel {
      *
      * @return Uma lista com os CCs encontrados
      */
-    public List<CostCenterEntry> getReferenceCostCenters() {
+    public List<CostCenter> getReferenceCostCenters() {
         return referenceCostCenters;
     }
 
@@ -151,7 +151,7 @@ public class CostCenterModel {
      */
     public void importCostCenterEntriesToDatabase() {
         for (Swap swap : swaps) {
-            for (CostCenterEntry entry : swap.getEntries()) {
+            for (CostCenter entry : swap.getEntries()) {
                 if (entry.getKey() != null && entry.getKey() > 0 && entry.getCostCenter() != null && entry.getCostCenter() > 0) {
                     insertContabilityEntryCostCenter(entry);
                 }
@@ -167,7 +167,7 @@ public class CostCenterModel {
      * Insere Centro de Custo no banco
      * @param entry CC a ser inserido.
      */
-    public void insertContabilityEntryCostCenter(CostCenterEntry entry) {
+    public void insertContabilityEntryCostCenter(CostCenter entry) {
         //Cria variavel de trocas
         Map<String, String> variableChanges = new HashMap<>();
 

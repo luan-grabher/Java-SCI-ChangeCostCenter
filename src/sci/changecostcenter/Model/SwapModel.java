@@ -1,22 +1,26 @@
 package sci.changecostcenter.Model;
 
-import Entity.Warning;
+import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import sci.changecostcenter.Model.Entity.CostCenter;
 import sci.changecostcenter.Model.Entity.Swap;
-import static sci.changecostcenter.SCIChangeCostCenter.log;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
+import static sci.changecostcenter.SCIChangeCostCenter.log;
+import sql.Database;
 
 public class SwapModel {
+
+    private static final String sql_GetContabilityEntries = FileManager.getText(FileManager.getFile("\\sql\\selectChangeCostCenterContabilityEntries.sql"));
 
     /**
      * Recebe as trocas na sua lista de trocas. Percorre trocas e cria cc no
      * banco. Faz call para CC Model para importar para o banco.
      */
-    private static List<Swap> swaps = new ArrayList<>();
+    private static final List<Swap> swaps = new ArrayList<>();
 
     public static List<Swap> getSwaps() {
         return swaps;
@@ -96,40 +100,46 @@ public class SwapModel {
             }
 
             //Cria variavel de lctos
-            //Procura lctos
-            //
-            //Se não encontrar nenhum lcto
-            //****Se tiver um filtro de complemento, valor e nf
-            //********Define o sqlSwap complement para o titulo(documento)
-            //********Define o sqlSwap value para o valor
-            //********Procura Lctos
-            //********Se encontrar lctos
-            //************Define a variavel de lctos os lctos
-            //Se encontrar lctos
-            //****Define a variavel de lctos os lctos
-            //
-            //
-            //Se existirem lctos na variavel de lctos
-            //****Adiciona CCs no mapa de CCs que serão inseridos
-            //Se não existirem lctos na variavel de lctos
-            //****Mostra no log que não foi encontrado lctos para aquele filtro
-            //
-            //
-            //
-            //"Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValue();
-            //log.append("\nNenhum lançamento encontrado para a procura: ").append(usedFilter);
-        });
-    }
+            List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
 
-    /**
-     * Busca lançamentos das trocas definidas
-     * 
-     * @param sqlSwaps Mapa de trocas SQL
-     */
-    private static Map<String, String> getEntries(Map<String, String> sqlSwaps) {
-        
-        
-        
-        return null;
+            //Se não encontrar nenhum lcto
+            if (entries.isEmpty() && swap.getComplementFilter() != null && swap.getDocument() != null && swap.getValueFilter() != null) {
+                //Define o sqlSwap complement para o titulo(documento)
+                sqlSwaps.put("complement", " AND BDCOMPL LIKE '%" + swap.getDocument() + "%' ");
+                //Define o sqlSwap value para o valor
+                sqlSwaps.put("value", " AND BDVALOR = " + swap.getValueFilter().toPlainString());
+
+                //Mostra filtro usado
+                String filter = "Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValueFilter();
+                usedFilter.put(filter, filter);
+
+                //Procura Lctos
+                entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
+            }
+
+            //Se existirem lctos na variavel de lctos
+            if (!entries.isEmpty()) {
+                //Se tiver valor para inserir ou filtro de valor, exclui todos lançamentos menos so primeiro
+                if (swap.getValue() != null || swap.getValueFilter() != null) {
+                    while (entries.size() > 1) {
+                        entries.remove(entries.size() - 1);
+                    }
+                }
+                //Para cada lcto
+                entries.forEach((e) ->{
+                    //Cria objeto CC
+                    CostCenter cc = new CostCenter();
+                    cc.setEnterprise(swap.getEnterprise());
+                    cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
+                });                                
+            } else {
+                //Se não existirem lctos na variavel de lctos
+                //****Mostra no log que não foi encontrado lctos para aquele filtro
+                log.append("\n\nNenhum lançamento encontrado para a procura: ");
+                usedFilter.forEach((f, filter) -> {
+                    log.append("\n").append(filter);
+                });
+            }
+        });
     }
 }
