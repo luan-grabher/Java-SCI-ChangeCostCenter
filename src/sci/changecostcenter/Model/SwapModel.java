@@ -131,7 +131,9 @@ public class SwapModel {
                     CostCenter cc = new CostCenter();
                     cc.setEnterprise(swap.getEnterprise());
                     cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
-                    cc.setCostCenter();
+                    cc.setCostCenter(swap.getCostCenter());
+                    cc.setValueType(swap.getValueType());
+                    cc.
                 });                                
             } else {
                 //Se não existirem lctos na variavel de lctos

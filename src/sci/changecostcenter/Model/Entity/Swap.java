@@ -21,13 +21,19 @@ public class Swap {
     private String document = null;
     private BigDecimal valueFilter = null;
 
-    //Inserts
+    //To CC
     private BigDecimal value = null;
     private BigDecimal percent = null;
+    
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
     private Integer costCenter = null;
     private Integer valueType = null;
+    private Integer account = null;
+
+    public Integer getAccount() {
+        return account;
+    }
 
     public Integer getCostCenter() {
         return costCenter;
@@ -82,6 +88,7 @@ public class Swap {
     }
 
     public void setAccountCreditOrDebit(Integer accountCreditOrDebit) {
+        account = accountCreditOrDebit;
         this.accountCreditOrDebit = accountCreditOrDebit;
     }
 
@@ -90,6 +97,7 @@ public class Swap {
     }
 
     public void setAccountCredit(Integer accountCredit) {
+        account = accountCredit;
         this.accountCredit = accountCredit;
     }
 
@@ -98,6 +106,7 @@ public class Swap {
     }
 
     public void setAccountDebit(Integer accountDebit) {
+        account = accountDebit;
         this.accountDebit = accountDebit;
     }
 
