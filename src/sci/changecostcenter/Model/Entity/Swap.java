@@ -21,15 +21,16 @@ public class Swap {
     private String document = null;
     private BigDecimal valueFilter = null;
 
-    //To CC
+    //Variaveis centro de custo
     private BigDecimal value = null;
     private BigDecimal percent = null;
     
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
-    private Integer costCenter = null;
-    private Integer valueType = null;
-    private Integer account = null;
+    
+    private Integer costCenter = null; //Definido automaticamente
+    private Integer valueType = null; //Definido automaticamente
+    private Integer account = null; //Definido automaticamente
 
     public Integer getAccount() {
         return account;

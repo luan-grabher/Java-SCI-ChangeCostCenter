@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class CostCenter {
 
+    /*DEBITO(0) E CREDITO(1)*/
     public static final Integer TYPE_DEBIT = 0;
     public static final Integer TYPE_CREDIT = 1;
 
@@ -11,12 +12,10 @@ public class CostCenter {
     private Integer key = null;
     private Integer centerCostPlan = null;
     private Integer costCenter = null;
-    private Integer valueType = null;
-    /*DEBITO(0) E CREDITO(1)*/
+    private Integer valueType = null; //Debito(0) ou Credito(1)    
     private BigDecimal value = null;
-    private Integer debitAccount = null;
-    private Integer creditAccount = null;
-    private Integer account = null;
+    private Integer account = null;    
+    
 
     public Integer getEnterprise() {
         return enterprise;
@@ -30,23 +29,13 @@ public class CostCenter {
         return account;
     }
 
-    public Integer getDebitAccount() {
-        return debitAccount;
-    }
-
     public void setDebitAccount(Integer debitAccount) {
         this.valueType = TYPE_DEBIT;
-        this.debitAccount = debitAccount;
         this.account = debitAccount;
-    }
-
-    public Integer getCreditAccount() {
-        return creditAccount;
     }
 
     public void setCreditAccount(Integer creditAccount) {
         this.valueType = TYPE_CREDIT;
-        this.creditAccount = creditAccount;
         this.account = creditAccount;
     }
 
@@ -76,10 +65,6 @@ public class CostCenter {
 
     public Integer getValueType() {
         return valueType;
-    }
-
-    public void setValueType(Integer valueType) {
-        this.valueType = valueType;
     }
 
     public BigDecimal getValue() {

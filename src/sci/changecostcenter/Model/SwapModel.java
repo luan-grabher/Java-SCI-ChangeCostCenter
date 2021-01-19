@@ -2,6 +2,7 @@ package sci.changecostcenter.Model;
 
 import fileManager.FileManager;
 import fileManager.StringFilter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,15 +127,26 @@ public class SwapModel {
                     }
                 }
                 //Para cada lcto
-                entries.forEach((e) ->{
+                entries.forEach((e) -> {
                     //Cria objeto CC
                     CostCenter cc = new CostCenter();
+                    cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));                    
                     cc.setEnterprise(swap.getEnterprise());
                     cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
+                    
+                    
                     cc.setCostCenter(swap.getCostCenter());
                     cc.setValueType(swap.getValueType());
-                    cc.
-                });                                
+                    
+                    
+                    cc.setValue(BigDecimal.ONE);
+                    
+                    //Se tiver o valor
+                    //----define o valor
+                    //se tiver porcentagem
+                    //----define o valor como a porcentagem do valor do lançamento
+                    
+                });
             } else {
                 //Se não existirem lctos na variavel de lctos
                 //****Mostra no log que não foi encontrado lctos para aquele filtro
