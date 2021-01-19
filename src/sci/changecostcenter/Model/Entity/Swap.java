@@ -3,6 +3,8 @@ package sci.changecostcenter.Model.Entity;
 import fileManager.StringFilter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_CREDIT;
+import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_DEBIT;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
 
 public class Swap {
@@ -24,10 +26,17 @@ public class Swap {
     private BigDecimal percent = null;
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
+    private Integer costCenter = null;
+    private Integer valueType = null;
 
-    /*
-     * ***********************************************************************
-     */
+    public Integer getCostCenter() {
+        return costCenter;
+    }
+
+    public Integer getValueType() {
+        return valueType;
+    }
+
     public void setValueFilter(BigDecimal valueFilter) {
         this.valueFilter = valueFilter;
     }
@@ -121,6 +130,8 @@ public class Swap {
     }
 
     public void setCostCenterCredit(Integer costCenterCredit) {
+        costCenter = costCenterCredit;
+        valueType = TYPE_CREDIT;
         this.costCenterCredit = costCenterCredit;
     }
 
@@ -129,6 +140,8 @@ public class Swap {
     }
 
     public void setCostCenterDebit(Integer costCenterDebit) {
+        costCenter = costCenterDebit;
+        valueType = TYPE_DEBIT;
         this.costCenterDebit = costCenterDebit;
     }
 
