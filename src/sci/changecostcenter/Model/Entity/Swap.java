@@ -13,8 +13,6 @@ public class Swap {
     private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;
-    private Integer participantCredit = null;
-    private Integer participantDebit = null;
     private Integer descriptionCode = null;
     private StringFilter complementFilter = null;
     private String document = null;
@@ -108,22 +106,6 @@ public class Swap {
     public void setAccountDebit(Integer accountDebit) {
         account = accountDebit;
         this.accountDebit = accountDebit;
-    }
-
-    public Integer getParticipantCredit() {
-        return participantCredit;
-    }
-
-    public void setParticipantCredit(Integer participantCredit) {
-        this.participantCredit = participantCredit;
-    }
-
-    public Integer getParticipantDebit() {
-        return participantDebit;
-    }
-
-    public void setParticipantDebit(Integer participantDebit) {
-        this.participantDebit = participantDebit;
     }
 
     public Integer getDescriptionCode() {
