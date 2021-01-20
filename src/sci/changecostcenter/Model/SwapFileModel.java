@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.ini4j.Profile.Section;
 import sci.changecostcenter.Model.Entity.Swap;
+import static sci.changecostcenter.SCIChangeCostCenter.ini;
 
 public class SwapFileModel {
 
@@ -20,14 +22,17 @@ public class SwapFileModel {
     }
 
     public void setSwaps() {
+        Section cols = (Section) ini.get("Swap File cols");
 
         if (file.exists() && !FileManager.getText(file).isBlank()) {
 
-            Integer colAccountCredit = 0;
-            Integer colAccountDebit = 1;
-            Integer colCostCenterDebit = 2;
-            Integer colCostCenterCredit = 3;
-            Integer colValue = 4;
+            Integer colEnterprise =  (Integer) cols.get("empresa");
+            Integer colAccountCredit = (Integer) cols.get("credito");
+            Integer colAccountDebit = (Integer) cols.get("debito");
+            Integer colCostCenterDebit = (Integer) cols.get("cc debito");
+            Integer colCostCenterCredit =  (Integer) cols.get("cc credito");
+            Integer colValue =  (Integer) cols.get("valor");
+            Integer colPercent =  (Integer) cols.get("valor");
 
             //Get file text lines
             String[] lines = FileManager.getText(file).split("\r\n");
