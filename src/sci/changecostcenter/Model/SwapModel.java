@@ -3,6 +3,7 @@ package sci.changecostcenter.Model;
 import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import sql.Database;
 public class SwapModel {
 
     private static final String sql_GetContabilityEntries = FileManager.getText(FileManager.getFile("\\sql\\selectChangeCostCenterContabilityEntries.sql"));
+    private static final String sql_InsertCostCenter = FileManager.getText(FileManager.getFile("\\sql\\insertCostCenter.sql"));
 
     /**
      * Recebe as trocas na sua lista de trocas. Percorre trocas e cria cc no
@@ -130,22 +132,39 @@ public class SwapModel {
                 entries.forEach((e) -> {
                     //Cria objeto CC
                     CostCenter cc = new CostCenter();
-                    cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));                    
+                    cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));
                     cc.setEnterprise(swap.getEnterprise());
                     cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
-                    
-                    
                     cc.setCostCenter(swap.getCostCenter());
-                    cc.setValueType(swap.getValueType());
-                    
-                    
-                    cc.setValue(BigDecimal.ONE);
-                    
+
+                    //Se a conta estiver definida
+                    if (swap.getAccount() != null) {
+                        //Insere a conta e o tipo de conta
+                        cc.setAccount(swap.getAccount(), swap.getValueType());
+                    } else {
+                        //Se não tiver a conta definida e for do tipo debito
+                        if (swap.getValueType().equals(CostCenter.TYPE_DEBIT)) {
+                            //Define a conta do lançamento como debito
+                            cc.setAccount(Integer.valueOf(e.get("BDDEBITO").toString()), CostCenter.TYPE_DEBIT);
+                        } else {
+                            //Define a conta do lançamento como credito
+                            cc.setAccount(Integer.valueOf(e.get("BDCREDITO").toString()), CostCenter.TYPE_CREDIT);
+                        }
+                    }
+
                     //Se tiver o valor
-                    //----define o valor
-                    //se tiver porcentagem
-                    //----define o valor como a porcentagem do valor do lançamento
+                    if (swap.getValue() != null) {
+                        //Define o valor
+                        cc.setValue(swap.getValue());
+                    }else if(swap.getPercent() != null){
+                        //Se tiver porcentagem
+                        //Define o valor como a % do valor do lançamento
+                        BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
+                        cc.setValue(value.multiply(swap.getPercent()));
+                    }
                     
+                    //Insere o CC
+                    insertCC(cc);
                 });
             } else {
                 //Se não existirem lctos na variavel de lctos
@@ -156,5 +175,39 @@ public class SwapModel {
                 });
             }
         });
+    }
+    
+    private static void insertCC(CostCenter cc){
+        if(cc.getEnterprise() != null 
+                && cc.getKey() != null 
+                && cc.getCenterCostPlan() != null 
+                && cc.getCostCenter() != null
+                && cc.getAccount() != null
+                && cc.getValue() != null
+                && cc.getValueType() != null){
+            Map<String,String> sqlChanges = new HashMap<>();
+            sqlChanges.put("enterprise", cc.getEnterprise().toString());
+            sqlChanges.put("key", cc.getKey().toString());
+            sqlChanges.put("centerCostPlan", cc.getCenterCostPlan().toString());
+            sqlChanges.put("centerCost", cc.getCostCenter().toString());
+            sqlChanges.put("valueType", cc.getValueType().toString());
+            sqlChanges.put("value", cc.getValue().toPlainString());
+            
+            
+            try {
+                Database.getDatabase().query(sql_InsertCostCenter, sqlChanges);
+            } catch (SQLException ex) {
+                throw new Error(ex);
+            }
+        }else{
+            log.append("\n").append("O centro de custo não foi inserido para os parametros porque um deles está nulo: ");
+            log.append("Empresa (").append(cc.getEnterprise()).append("), ");
+            log.append("Chave (").append(cc.getKey()).append("), ");
+            log.append("CC Plano (").append(cc.getCenterCostPlan()).append("), ");
+            log.append("CC (").append(cc.getCostCenter()).append("), ");
+            log.append("Conta (").append(cc.getAccount()).append("), ");
+            log.append("Valor (").append(cc.getValue().toPlainString()).append("), ");
+            log.append("Tipo do valor (").append(cc.getValueType()).append("), ");
+        }
     }
 }

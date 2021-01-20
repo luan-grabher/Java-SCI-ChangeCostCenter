@@ -5,12 +5,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_CREDIT;
 import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_DEBIT;
-import static sci.changecostcenter.SCIChangeCostCenter.ini;
 
 public class Swap {
 
     //Filtros
-    private Integer enterprise = Integer.valueOf(ini.get("Config", "enterprise"));
+    private Integer enterprise = null;
     private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;

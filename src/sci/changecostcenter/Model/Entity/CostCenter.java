@@ -28,15 +28,10 @@ public class CostCenter {
     public Integer getAccount() {
         return account;
     }
-
-    public void setDebitAccount(Integer debitAccount) {
-        this.valueType = TYPE_DEBIT;
-        this.account = debitAccount;
-    }
-
-    public void setCreditAccount(Integer creditAccount) {
-        this.valueType = TYPE_CREDIT;
-        this.account = creditAccount;
+    
+    public void setAccount(Integer account, Integer type){
+        this.valueType = type;
+        this.account = account;
     }
 
     public Integer getKey() {

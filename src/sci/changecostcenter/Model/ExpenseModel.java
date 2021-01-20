@@ -12,14 +12,13 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Expense;
 import sci.changecostcenter.Model.Entity.Swap;
 import Entity.ErrorIgnore;
 import Entity.Warning;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.ini4j.Profile.Section;
-import sci.changecostcenter.SCIChangeCostCenter;
+import static sci.changecostcenter.SCIChangeCostCenter.ini;
 import static sci.changecostcenter.SCIChangeCostCenter.log;
 
 public class ExpenseModel {
@@ -50,21 +49,23 @@ public class ExpenseModel {
     }
 
     private void getExpenseList() {
-        Section expenseSection = SCIChangeCostCenter.ini.get("Expense cols");
+        Section expenseSection =  (Section) ini.get("Expense cols");
         
-        StringFilter filterProviders = new StringFilter(SCIChangeCostCenter.ini.get("Expense","filtroFornecedores"));
+        
+        StringFilter filterProviders = new StringFilter(ini.get("Expense","filtroFornecedores"));
 
-        Integer colDre = JExcel.Cell(expenseSection.get("DRE"));
-        Integer colExpenseDescription = JExcel.Cell(expenseSection.get("Descrição Despesa"));
-        Integer colCostCenterName = JExcel.Cell(expenseSection.get("Nome CC"));
-        Integer colNatureCode = JExcel.Cell(expenseSection.get("Codigo Natureza"));
-        Integer colNatureDescription = JExcel.Cell(expenseSection.get("Descrição Natureza"));
-        Integer colProvider = JExcel.Cell(expenseSection.get("Fornecedor"));
-        Integer colProviderName = JExcel.Cell(expenseSection.get("Nome Fornecedor"));
-        Integer colValue = JExcel.Cell(expenseSection.get("Valor"));
-        Integer colDate = JExcel.Cell(expenseSection.get("Data"));
-        Integer colDueDate = JExcel.Cell(expenseSection.get("Data Pagamento"));
-        Integer colTitle = JExcel.Cell(expenseSection.get("Titulo"));
+        Integer colDre = JExcel.Cell((String) expenseSection.get("DRE"));
+        Integer colExpenseDescription = JExcel.Cell((String) expenseSection.get("Descrição Despesa"));
+        Integer colCostCenterName = JExcel.Cell((String) expenseSection.get("Nome CC"));
+        Integer colNatureCode = JExcel.Cell((String) expenseSection.get("Codigo Natureza"));
+        Integer colNatureDescription = JExcel.Cell((String) expenseSection.get("Descrição Natureza"));
+        Integer colProvider = JExcel.Cell((String) expenseSection.get("Fornecedor"));
+        Integer colProviderName = JExcel.Cell((String) expenseSection.get("Nome Fornecedor"));
+        
+        Integer colValue = JExcel.Cell((String) expenseSection.get("Valor"));
+        Integer colDate = JExcel.Cell((String) expenseSection.get("Data"));
+        Integer colDueDate = JExcel.Cell((String) expenseSection.get("Data Pagamento"));
+        Integer colTitle = JExcel.Cell((String) expenseSection.get("Titulo"));
 
         //Contagem de erros
         Integer errors = 0;
@@ -148,7 +149,7 @@ public class ExpenseModel {
     public List<Swap> convertExpensesToSwapList() {
         List<Swap> swaps = new ArrayList<>();
         
-        Section ccSection = SCIChangeCostCenter.ini.get("CostCenter");
+        Section ccSection = (Section) ini.get("CostCenter");
 
         /*Percorre despesas das notas fiscais*/
         expenses.forEach((doc, docExpenses) -> {
@@ -164,26 +165,19 @@ public class ExpenseModel {
                 swap.getComplementFilter().setHas(hasList); //Define o que o filtro deve possuir
 
                 //Para o filtro extra
-                swap.setValue(docExpense.getValue());
+                swap.setValueFilter(docExpense.getValue());
                 swap.setDocument(docExpense.getTitle());
 
                 //Pega o número do centro de custo no ENV pelo nome
-                String costCenterEnv = ccSection.get(docExpense.getCostCenterName());
+                String costCenterEnv = (String) ccSection.get(docExpense.getCostCenterName());
                 if (costCenterEnv == null) {
                     throw new Error("Centro de custo '" + docExpense.getCostCenterName() + "' não encontrado no arquivo .INI");
                 }
                 docExpense.setCostCenter(Integer.valueOf(costCenterEnv));
-                //Define o Centro de custo de débito da troca como o centro de custo
-                //O CC de credito irá ficar nulo
+                //Define o cc de débito da troca como o cc
                 swap.setCostCenterDebit(docExpense.getCostCenter());
-
-                //Cria lista de entradas no banco
-                CostCenterEntry costCenterEntry = new CostCenterEntry(); //Instancia Entrada de Centro de Custo
-                costCenterEntry.setCostCenter(docExpense.getCostCenter()); //Define o centro de custo 
-                costCenterEntry.setValueType(CostCenterEntry.TYPE_DEBIT); // define o tipo do valor como debito
-                costCenterEntry.setValue(docExpense.getValue()); //define o valor
-
-                swap.getEntries().add(costCenterEntry); //Adiciona nas entradas da troca
+                
+                swap.setValue(docExpense.getValue());
 
                 //Adiciona Swap
                 swaps.add(swap);

@@ -8,22 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import sci.changecostcenter.Model.Entity.CostCenterEntry;
 import sci.changecostcenter.Model.Entity.Swap;
 
 public class SwapFileModel {
 
     private File file;
     private List<Swap> swaps = new ArrayList<>();
-    private List<CostCenterEntry> referenceCostCenters = new ArrayList<>();
-
-    public List<CostCenterEntry> getReferenceCostCenters() {
-        return referenceCostCenters;
-    }
-
-    public void setReferenceCostCenters(List<CostCenterEntry> referenceCostCenters) {
-        this.referenceCostCenters = referenceCostCenters;
-    }
 
     public void setFile(File file) {
         this.file = file;
@@ -123,14 +113,6 @@ public class SwapFileModel {
         if (swaps.isEmpty()) {
             throw new ErrorIgnore("Nenhuma troca para ser feita encontrada no arquivo de trocas.");
         }
-    }
-
-    private Predicate<CostCenterEntry> centerCostHasCreditAccount(Integer account) {
-        return c -> Objects.equals(c.getCreditAccount(), account);
-    }
-
-    private Predicate<CostCenterEntry> centerCostHasDebitAccount(Integer account) {
-        return c -> Objects.equals(c.getDebitAccount(), account);
     }
 
     public List<Swap> getSwaps() {
