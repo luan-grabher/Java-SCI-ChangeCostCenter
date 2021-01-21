@@ -14,8 +14,10 @@ select
     BDCODTERCEIROC,
     (SELECT COUNT(*) FROM VSUC_EMPRESAS_TLCC C WHERE C.BDCODEMP = :enterpriseCode AND C.BDCHAVE = L.BDCHAVE) as CC_COUNT
 from VSUC_EMPRESAS_TLAN L
-WHERE L.BDCODEMP = :enterprise
+WHERE 
+L.BDCODEMP = :enterprise
+AND L.BDREFERENCIA = :reference
+and L.BDTIPOLANORIG  = 100
 :complement
 :account
 :value
-and L.BDTIPOLANORIG  = 100

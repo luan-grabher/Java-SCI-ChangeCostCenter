@@ -12,6 +12,7 @@ import sci.changecostcenter.Model.Entity.CostCenter;
 import sci.changecostcenter.Model.Entity.Swap;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
 import static sci.changecostcenter.SCIChangeCostCenter.log;
+import static sci.changecostcenter.SCIChangeCostCenter.reference;
 import sql.Database;
 
 public class SwapModel {
@@ -33,13 +34,14 @@ public class SwapModel {
         swaps.add(swap);
     }
 
-    public static void setKeysOfSwaps() {
+    public static void insertCcForEachSwap() {
         swaps.forEach((swap) -> {
             Map<String, String> usedFilter = new HashMap<>();
 
             Map<String, String> sqlSwaps = new HashMap<>();
             sqlSwaps.put("enterprise", swap.getEnterprise().toString());//Empresa
             sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
+            sqlSwaps.put("reference", reference);
             sqlSwaps.put("complement", "");//Plano Centro de Custo
 
             if (swap.getComplementFilter() != null) {//Filtro para o complemento

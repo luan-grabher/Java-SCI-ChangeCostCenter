@@ -7,20 +7,7 @@ import sci.changecostcenter.Model.SwapModel;
 import sci.changecostcenter.SCIChangeCostCenter;
 import sql.Database;
 
-public class Controller {
-
-    //Models
-    private final CostCenterModel costCenterModel = new CostCenterModel();
-    private final SwapModel swapModel = new SwapModel();
-
-    private String reference = "202001";
-
-    /** Define Referencia
-     *  @param reference Referencia AAAAMM
-     */
-    public void setReference(String reference) {
-        this.reference = reference;
-    }    
+public class Controller {  
 
     /** 
      * Define Database estático conforme local definido no arquivo ENV
@@ -50,29 +37,6 @@ public class Controller {
         @Override
         public void run() {
             
-        }
-        
-    }
-
-    /**
-     * Cria lista de lançamentos que não tem centro de custo naquela referência
-     */
-    public class getContabilityEntries extends Executavel {
-
-        @Override
-        public void run() {
-            costCenterModel.getReferenceContabilityEntries(reference);
-        }
-    }
-    
-    /**
-     * Cria lista de Centros de custo dos lançamentos do mês da referência
-     */
-    public class getReferenceCostCenters extends Executavel{
-
-        @Override
-        public void run() {
-            swapModel.setReferenceCostCenters(costCenterModel.getReferenceCostCenterEntries(reference));
         }
         
     }
@@ -125,18 +89,6 @@ public class Controller {
             swapModel.setKeysOfSwaps(costCenterModel.getContabilityEntries());
             //Function to create a swap list
             costCenterModel.setSwaps(swapModel.getSwaps());
-        }
-
-    }
-
-    /**
-     * Importa as trocas para 
-     */
-    public class importCostCenterEntriesToDatabase extends Executavel {
-
-        @Override
-        public void run() {
-            costCenterModel.importCostCenterEntriesToDatabase();
         }
 
     }

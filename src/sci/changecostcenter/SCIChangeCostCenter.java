@@ -16,6 +16,7 @@ public class SCIChangeCostCenter {
 
     public static StringBuilder log = new StringBuilder("");
     public static Ini ini = null;
+    public static String reference;
 
     public static void main(String[] args) {
         String name = "Zampieron trocar centros de custo ";
@@ -77,9 +78,9 @@ public class SCIChangeCostCenter {
         String str = "";
 
         try {
+            reference = year + (month < 10 ? "0" : "") + month;
+            
             Controller controller = new Controller();
-            //Define a referencia ANOMES
-            controller.setReference(year + (month < 10 ? "0" : "") + month);
 
             //Inicia mapa
             Map<String, Executavel> execs = new LinkedHashMap();
