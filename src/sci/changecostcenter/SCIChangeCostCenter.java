@@ -86,13 +86,10 @@ public class SCIChangeCostCenter {
             Map<String, Executavel> execs = new LinkedHashMap();
 
             execs.put("Definindo banco de dados",controller.new defineDatabase()); //Define o banco de dados estático
-            /* RESETA CENTROS DE CUSTO DO MÊS */
-            execs.put("Pegando Rateios do Mês no banco", controller.new getReferenceCostCenters()); //Pega Centros de Custo (Rateio) do mês indicado
-            execs.add(controller.new getContabilityEntries()); //Pega Lançamentos do mês indicado
-            execs.add(controller.new setExpensesFile(expensesFile)); //Pega despesas do arquivo de despesas
-            execs.add(controller.new setSwapsFile(swapsFile)); //Pega trocas únicas do arquivo de trocas únicas
-            execs.add(controller.new setSwapsToImport()); //Busca o lançamento de cada troca única
-            execs.add(controller.new importCostCenterEntriesToDatabase()); //Importa o centro de custo para o banco de dados
+            execs.put("Excluindo lançamentos de Centro de Custo da Referencia", controller.new deleteReferenceCCs());
+            execs.put("Definindo trocas das despesas", controller.new setExpensesFile(expensesFile));
+            execs.put("Definindo trocas do arquivo de trocas", controller.new setSwapsFile(swapsFile));
+            execs.put("Importando para o banco de dados", controller.new importSwapsToDb());
 
             Execution execution = new Execution(name);
             execution.setShowMessages(true);

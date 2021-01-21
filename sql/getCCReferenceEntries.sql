@@ -1,0 +1,8 @@
+select
+    LIST(BDCHAVE),
+    BDCHAVE
+from VSUC_EMPRESAS_TLAN L
+WHERE 
+L.BDCODEMP = :enterprise
+AND L.BDREFERENCIA = :reference
+and L.BDTIPOLANORIG  = 100
