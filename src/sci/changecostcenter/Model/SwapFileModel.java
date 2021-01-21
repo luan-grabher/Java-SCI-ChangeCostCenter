@@ -6,110 +6,71 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 import org.ini4j.Profile.Section;
 import sci.changecostcenter.Model.Entity.Swap;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
+import static sci.changecostcenter.SCIChangeCostCenter.log;
 
 public class SwapFileModel {
 
-    private File file;
-    private List<Swap> swaps = new ArrayList<>();
+    public static List<Swap> setSwaps(File file) {
+        List<Swap> swaps = new ArrayList<>();
 
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public void setSwaps() {
         Section cols = (Section) ini.get("Swap File cols");
 
         if (file.exists() && !FileManager.getText(file).isBlank()) {
 
-            Integer colEnterprise =  (Integer) cols.get("empresa");
-            Integer colAccountCredit = (Integer) cols.get("credito");
-            Integer colAccountDebit = (Integer) cols.get("debito");
-            Integer colCostCenterDebit = (Integer) cols.get("cc debito");
-            Integer colCostCenterCredit =  (Integer) cols.get("cc credito");
-            Integer colValue =  (Integer) cols.get("valor");
-            Integer colPercent =  (Integer) cols.get("valor");
+            Integer colEnterprise = (Integer) cols.get("empresa");
+            Integer colCredit = (Integer) cols.get("credito");
+            Integer colDebit = (Integer) cols.get("debito");
+            Integer colCcDebit = (Integer) cols.get("cc debito");
+            Integer colCcCredit = (Integer) cols.get("cc credito");
+            Integer colValue = (Integer) cols.get("valor");
+            Integer colPercent = (Integer) cols.get("porcentagem");
 
-            //Get file text lines
+            //Pega linhas do arquivo de texto
             String[] lines = FileManager.getText(file).split("\r\n");
 
             //Percorre linhas
             for (String line : lines) {
                 try {
-                    String[] collumns = line.split(";");
+                    //Remove espaços
+                    line = line.replaceAll(" ", "");
 
-                    //Verifica se existem apenas números na coluna de conta de crédito e débito
-                    if (collumns[colAccountCredit].matches("[0-9]+") && collumns[colAccountDebit].matches("[0-9]+")) {
+                    //Se a linha só tiver números continua, se nao é cabeçalho
+                    if (line.matches("[0-9;.,]+")) {
+                        String[] collumns = line.split(";");
 
-                        //Define conta utilizada
-                        Integer accountCredit = Integer.valueOf(collumns[colAccountCredit]);
-                        Integer accountDebit = Integer.valueOf(collumns[colAccountDebit]);
-                        Integer costCenterCredit = Integer.valueOf(collumns[colCostCenterCredit]);
-                        Integer costCenterDebit = Integer.valueOf(collumns[colCostCenterDebit]);
-
-                        //Cria Predicados
-                        Predicate<CostCenterEntry> predicateAccount;
+                        //getInteger transforma em branco em null
+                        Integer enterprise = Integer.getInteger(collumns[colEnterprise]);
+                        Integer credit = Integer.getInteger(collumns[colCredit]);
+                        Integer debit = Integer.getInteger(collumns[colDebit]);
+                        Integer ccCredit = Integer.getInteger(collumns[colCcCredit]);
+                        Integer ccDebit = Integer.getInteger(collumns[colCcDebit]);
+                        BigDecimal value = collumns[colValue].equals("") ? null : new BigDecimal(brVal(collumns[colValue]));
+                        BigDecimal percent = collumns[colPercent].equals("") ? null : new BigDecimal(brVal(collumns[colPercent]));
 
                         //Cria objeto de troca
                         Swap swap = new Swap();
+                        swap.setEnterprise(enterprise);
+                        swap.setCostCenterCredit(ccCredit);
+                        swap.setCostCenterDebit(ccDebit);
+                        swap.setValue(value);
+                        swap.setPercent(percent);
 
-                        //Define conta da troca e do predicado
-                        if (accountCredit != 0) {
-                            swap.setAccountCredit(accountCredit);
-                            predicateAccount = centerCostHasCreditAccount(accountCredit);
+                        //Se tiver conta nos dois e a conta for igual
+                        if (credit != null && credit.equals(debit)) {
+                            swap.setAccountCreditOrDebit(ccCredit);
                         } else {
-                            swap.setAccountDebit(accountDebit);
-                            predicateAccount = centerCostHasDebitAccount(accountDebit);
+                            //Se não define as contas de credito e debito
+                            swap.setAccountCredit(credit);
+                            swap.setAccountDebit(debit);
                         }
 
-                        //Define centro de custo da troca
-                        Integer costCenter;
-                        Integer valueType;
-                        if (costCenterCredit != 0) {
-                            costCenter = costCenterCredit;
-                            valueType = CostCenterEntry.TYPE_CREDIT;
-                            swap.setCostCenterCredit(costCenterCredit);
-                        } else {
-                            costCenter = costCenterDebit;
-                            valueType = CostCenterEntry.TYPE_DEBIT;
-                            swap.setCostCenterDebit(costCenterDebit);
-                        }
-
-                        //Set value
-                        String valueString = collumns[colValue].replaceAll("\\.", "").replaceAll(",", ".");
-                        BigDecimal value = new BigDecimal(valueString);
-
-                        //Veririca se nao existe no banco ja um centro de custo
-                        boolean costCenterAlreadyExist = referenceCostCenters.stream().anyMatch(
-                                predicateAccount
-                                        .and(
-                                                c -> Objects.equals(c.getCostCenter(), costCenter))
-                                        .and(
-                                                c -> Objects.equals(c.getValueType(), valueType))
-                        /*.and(
-                                            c -> c.getValue().compareTo(value) == 0)*/
-                        );
-
-                        if (!costCenterAlreadyExist) {
-                            //Cria lançamento para a troca
-                            CostCenterEntry costCenterEntry = new CostCenterEntry();
-                            costCenterEntry.setCostCenter(costCenter);
-                            costCenterEntry.setValueType(valueType);
-
-                            costCenterEntry.setValue(value);
-
-                            //Adiciona lançamento na troca
-                            swap.getEntries().add(costCenterEntry);
-
-                            swaps.add(swap);
-                        }
+                        swaps.add(swap);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.append("\n A seguinte linha do arquivo de trocas não foi inserida: ").append(line);
                 }
             }
         }
@@ -118,9 +79,11 @@ public class SwapFileModel {
         if (swaps.isEmpty()) {
             throw new ErrorIgnore("Nenhuma troca para ser feita encontrada no arquivo de trocas.");
         }
+
+        return swaps;
     }
 
-    public List<Swap> getSwaps() {
-        return swaps;
+    private static String brVal(String str) {
+        return str.replaceAll("\\.", "").replaceAll(",", ".");
     }
 }

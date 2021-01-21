@@ -1,30 +1,18 @@
 package testPack;
 
-import SimpleDotEnv.Env;
 import java.io.File;
 import sci.changecostcenter.SCIChangeCostCenter;
 
 public class testMain {
 
     public static void main(String[] args) {
-        mainFunction();
+        testStr();
     }
     
-    public static void testFolder(){
-        String cfgPath = Env.get("databaseCfgFilePath");
-        
-        System.out.println("Path cfg: " + cfgPath);
-        
-        File folder = new File(cfgPath);
-        
-        System.out.println(folder.getAbsolutePath());
-        System.out.println(folder.exists());
-        
-        System.out.println(folder.listFiles().length +  " arquivos e pastas encontrados:");
-        
-        for (File file : folder.listFiles()) {
-            System.out.println(file.getName());
-        }
+    public static void testStr(){
+        String str = "";
+
+        System.out.println(str.matches("[0-9]+"));
     }
 
     public static void mainFunction() {

@@ -8,12 +8,13 @@ import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_DEBIT;
 
 public class Swap {
 
-    //Filtros
+    //Filtros arquivo de trocas
     private Integer enterprise = null;
     private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;
-    private Integer descriptionCode = null;
+    
+    //Filtros arquivo de despesas
     private StringFilter complementFilter = null;
     private String document = null;
     private BigDecimal valueFilter = null;
@@ -21,10 +22,10 @@ public class Swap {
     //Variaveis centro de custo
     private BigDecimal value = null;
     private BigDecimal percent = null;
-    
+
     private Integer costCenterCredit = null;
     private Integer costCenterDebit = null;
-    
+
     private Integer costCenter = null; //Definido automaticamente
     private Integer valueType = null; //Definido automaticamente
     private Integer account = null; //Definido automaticamente
@@ -108,22 +109,16 @@ public class Swap {
         this.accountDebit = accountDebit;
     }
 
-    public Integer getDescriptionCode() {
-        return descriptionCode;
-    }
-
-    public void setDescriptionCode(Integer descriptionCode) {
-        this.descriptionCode = descriptionCode;
-    }
-
     public Integer getCostCenterCredit() {
         return costCenterCredit;
     }
 
     public void setCostCenterCredit(Integer costCenterCredit) {
-        costCenter = costCenterCredit;
-        valueType = TYPE_CREDIT;
-        this.costCenterCredit = costCenterCredit;
+        if (costCenterCredit != null) {
+            costCenter = costCenterCredit;
+            valueType = TYPE_CREDIT;
+            this.costCenterCredit = costCenterCredit;
+        }
     }
 
     public Integer getCostCenterDebit() {
@@ -131,9 +126,11 @@ public class Swap {
     }
 
     public void setCostCenterDebit(Integer costCenterDebit) {
-        costCenter = costCenterDebit;
-        valueType = TYPE_DEBIT;
-        this.costCenterDebit = costCenterDebit;
+        if (costCenterDebit != null) {
+            costCenter = costCenterDebit;
+            valueType = TYPE_DEBIT;
+            this.costCenterDebit = costCenterDebit;
+        }
     }
 
     public StringFilter getComplementFilter() {
