@@ -13,8 +13,7 @@ public class CostCenter {
     private Integer centerCostPlan = null;
     private Integer costCenter = null;
     private Integer valueType = null; //Debito(0) ou Credito(1)    
-    private BigDecimal value = null;
-    private Integer account = null;    
+    private BigDecimal value = null;  
     
 
     public Integer getEnterprise() {
@@ -23,15 +22,6 @@ public class CostCenter {
 
     public void setEnterprise(Integer enterprise) {
         this.enterprise = enterprise;
-    }
-
-    public Integer getAccount() {
-        return account;
-    }
-    
-    public void setAccount(Integer account, Integer type){
-        this.valueType = type;
-        this.account = account;
     }
 
     public Integer getKey() {
@@ -54,7 +44,8 @@ public class CostCenter {
         return costCenter;
     }
 
-    public void setCostCenter(Integer costCenter) {
+    public void setCostCenter(Integer costCenter, Integer type) {
+        this.valueType = type;
         this.costCenter = costCenter;
     }
 

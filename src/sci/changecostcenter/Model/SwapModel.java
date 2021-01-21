@@ -137,22 +137,7 @@ public class SwapModel {
                     cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));
                     cc.setEnterprise(swap.getEnterprise());
                     cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
-                    cc.setCostCenter(swap.getCostCenter());
-
-                    //Se a conta estiver definida
-                    if (swap.getAccount() != null) {
-                        //Insere a conta e o tipo de conta
-                        cc.setAccount(swap.getAccount(), swap.getValueType());
-                    } else {
-                        //Se não tiver a conta definida e for do tipo debito
-                        if (swap.getValueType().equals(CostCenter.TYPE_DEBIT)) {
-                            //Define a conta do lançamento como debito
-                            cc.setAccount(Integer.valueOf(e.get("BDDEBITO").toString()), CostCenter.TYPE_DEBIT);
-                        } else {
-                            //Define a conta do lançamento como credito
-                            cc.setAccount(Integer.valueOf(e.get("BDCREDITO").toString()), CostCenter.TYPE_CREDIT);
-                        }
-                    }
+                    cc.setCostCenter(swap.getCostCenter(), swap.getValueType());
 
                     //Se tiver o valor
                     if (swap.getValue() != null) {
@@ -184,7 +169,6 @@ public class SwapModel {
                 && cc.getKey() != null
                 && cc.getCenterCostPlan() != null
                 && cc.getCostCenter() != null
-                && cc.getAccount() != null
                 && cc.getValue() != null
                 && cc.getValueType() != null) {
             Map<String, String> sqlChanges = new HashMap<>();
@@ -214,7 +198,6 @@ public class SwapModel {
             log.append("Chave (").append(cc.getKey()).append("), ");
             log.append("CC Plano (").append(cc.getCenterCostPlan()).append("), ");
             log.append("CC (").append(cc.getCostCenter()).append("), ");
-            log.append("Conta (").append(cc.getAccount()).append("), ");
             log.append("Valor (").append(cc.getValue().toPlainString()).append("), ");
             log.append("Tipo do valor (").append(cc.getValueType()).append("), ");
         }
