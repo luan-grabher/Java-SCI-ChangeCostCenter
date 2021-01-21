@@ -23,36 +23,36 @@ import static sci.changecostcenter.SCIChangeCostCenter.log;
 
 public class ExpenseModel {
 
-    private File file;
-
-    private XSSFWorkbook workbook;
-    private XSSFSheet sheet;
-
-    private Map<String, List<Expense>> expenses = new HashMap<>();
-
-    public void setFile(File file) {
-        this.file = file;
+    /**
+     * Pega Lista de Trocas do arquivo de despesas e converte em trocas
+     *
+     * @param file Arquivo de despesas
+     * @return list of swaps of expenses of file
+     */
+    public static List<Swap> getSwaps(File file) {
+        XSSFSheet sheet = defineWorkbook(file);
+        Map<String, List<Expense>> expenses = getExpenseList(sheet);
+        return convertExpenseListToSwaps(expenses);
     }
 
-    public void setExpenses() {
-        defineWorkbook();
-        getExpenseList();
-    }
-
-    private void defineWorkbook() {
+    /**
+     * @param file Arquivo de despesas
+     */
+    private static XSSFSheet defineWorkbook(File file) {
         try {
-            workbook = new XSSFWorkbook(file);
-            sheet = workbook.getSheetAt(workbook.getFirstVisibleTab());
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            return workbook.getSheetAt(workbook.getFirstVisibleTab());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Error(e);
         }
     }
 
-    private void getExpenseList() {
-        Section expenseSection =  (Section) ini.get("Expense cols");
-        
-        
-        StringFilter filterProviders = new StringFilter(ini.get("Expense","filtroFornecedores"));
+    private static Map<String, List<Expense>> getExpenseList(XSSFSheet sheet) {
+        Map<String, List<Expense>> expenses = new HashMap<>();
+
+        Section expenseSection = (Section) ini.get("Expense cols");
+
+        StringFilter filterProviders = new StringFilter(ini.get("Expense", "filtroFornecedores"));
 
         Integer colDre = JExcel.Cell((String) expenseSection.get("DRE"));
         Integer colExpenseDescription = JExcel.Cell((String) expenseSection.get("Descrição Despesa"));
@@ -61,7 +61,7 @@ public class ExpenseModel {
         Integer colNatureDescription = JExcel.Cell((String) expenseSection.get("Descrição Natureza"));
         Integer colProvider = JExcel.Cell((String) expenseSection.get("Fornecedor"));
         Integer colProviderName = JExcel.Cell((String) expenseSection.get("Nome Fornecedor"));
-        
+
         Integer colValue = JExcel.Cell((String) expenseSection.get("Valor"));
         Integer colDate = JExcel.Cell((String) expenseSection.get("Data"));
         Integer colDueDate = JExcel.Cell((String) expenseSection.get("Data Pagamento"));
@@ -134,21 +134,17 @@ public class ExpenseModel {
 
         if (errors > 0) {
             throw new Warning("Existem " + errors + " linhas com erros no arquivo de despesa que foram ignoradas de " + sheet.getLastRowNum() + " linhas encontradas.");
-        }
-
-        if (expenses.isEmpty()) {
+        } else if (expenses.isEmpty()) {
             throw new ErrorIgnore("Nenhuma despesa encontrada no arquivo de despesas.");
+        } else {
+            return expenses;
         }
     }
 
-    /**
-     * Get swap list from expenses of file
-     *
-     * @return list of swaps of expenses of file
-     */
-    public List<Swap> convertExpensesToSwapList() {
+    private static List<Swap> convertExpenseListToSwaps(Map<String, List<Expense>> expenses) {
+
         List<Swap> swaps = new ArrayList<>();
-        
+
         Section ccSection = (Section) ini.get("CostCenter");
 
         /*Percorre despesas das notas fiscais*/
@@ -176,7 +172,7 @@ public class ExpenseModel {
                 docExpense.setCostCenter(Integer.valueOf(costCenterEnv));
                 //Define o cc de débito da troca como o cc
                 swap.setCostCenterDebit(docExpense.getCostCenter());
-                
+
                 swap.setValue(docExpense.getValue());
 
                 //Adiciona Swap
@@ -187,7 +183,4 @@ public class ExpenseModel {
         return swaps;
     }
 
-    public Map<String, List<Expense>> getExpenses() {
-        return expenses;
-    }
 }

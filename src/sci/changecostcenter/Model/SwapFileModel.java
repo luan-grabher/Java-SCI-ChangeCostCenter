@@ -13,7 +13,7 @@ import static sci.changecostcenter.SCIChangeCostCenter.log;
 
 public class SwapFileModel {
 
-    public static List<Swap> setSwaps(File file) {
+    public static List<Swap> getSwaps(File file) {
         List<Swap> swaps = new ArrayList<>();
 
         Section cols = (Section) ini.get("Swap File cols");

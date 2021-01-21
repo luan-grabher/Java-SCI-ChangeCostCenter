@@ -33,6 +33,9 @@ public class SwapModel {
     public static void addSwap(Swap swap) {
         swaps.add(swap);
     }
+    public static void addSwaps(List<Swap> swaps) {
+        swaps.addAll(swaps);
+    }
 
     public static void insertCcForEachSwap() {
         swaps.forEach((swap) -> {

@@ -2,20 +2,21 @@ package sci.changecostcenter.Control;
 
 import Entity.Executavel;
 import java.io.File;
-import sci.changecostcenter.Model.CostCenterModel;
+import sci.changecostcenter.Model.ExpenseModel;
+import sci.changecostcenter.Model.SwapFileModel;
 import sci.changecostcenter.Model.SwapModel;
-import sci.changecostcenter.SCIChangeCostCenter;
+import static sci.changecostcenter.SCIChangeCostCenter.ini;
 import sql.Database;
 
 public class Controller {  
 
     /** 
-     * Define Database estático conforme local definido no arquivo ENV
+     * Define Database estático conforme local definido no arquivo INI
      */
     public class defineDatabase extends Executavel {
         @Override
         public void run() {
-            File databseConfigFile = new File(SCIChangeCostCenter.ini.get("Config","databaseCfgFilePath"));
+            File databseConfigFile = new File(ini.get("Config","databaseCfgFilePath"));
 
             if (databseConfigFile.exists()) {
                 Database.setStaticObject(new Database(databseConfigFile));
@@ -36,11 +37,12 @@ public class Controller {
 
         @Override
         public void run() {
-            
-        }
-        
+            //Cria mapa de trocas com referencia e empresa
+            //Lista empresas das trocas
+            //para cada empresa exclui os cc das referencias
+            //executa query sql com o arquivo sql
+        }        
     }
-
     
     /**
      * Cria lista de trocas do arquivo de Despesas
@@ -55,7 +57,7 @@ public class Controller {
 
         @Override
         public void run() {
-            swapModel.importExpenseSwaps(file);
+            SwapModel.addSwaps(ExpenseModel.getSwaps(file));
         }
     }
 
@@ -72,24 +74,7 @@ public class Controller {
 
         @Override
         public void run() {
-            swapModel.importSwapFileSwaps(file);
-            costCenterModel.setSwaps(swapModel.getSwaps());
+            SwapModel.addSwaps(SwapFileModel.getSwaps(file));
         }
-    }
-
-    /**
-     * Define as chaves dos lançamentos das trocas, depois define as trocas a
-     * serem realizadas no modelo do CC com as trocas do modelo de trocas.
-     **/
-    public class setSwapsToImport extends Executavel {
-
-        @Override
-        public void run() {
-            //Set swaps
-            swapModel.setKeysOfSwaps(costCenterModel.getContabilityEntries());
-            //Function to create a swap list
-            costCenterModel.setSwaps(swapModel.getSwaps());
-        }
-
     }
 }
