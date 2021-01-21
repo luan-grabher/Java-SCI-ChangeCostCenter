@@ -156,13 +156,13 @@ public class SwapModel {
                     if (swap.getValue() != null) {
                         //Define o valor
                         cc.setValue(swap.getValue());
-                    }else if(swap.getPercent() != null){
+                    } else if (swap.getPercent() != null) {
                         //Se tiver porcentagem
                         //Define o valor como a % do valor do lançamento
                         BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
                         cc.setValue(value.multiply(swap.getPercent()));
                     }
-                    
+
                     //Insere o CC
                     insertCC(cc);
                 });
@@ -176,30 +176,37 @@ public class SwapModel {
             }
         });
     }
-    
-    private static void insertCC(CostCenter cc){
-        if(cc.getEnterprise() != null 
-                && cc.getKey() != null 
-                && cc.getCenterCostPlan() != null 
+
+    private static void insertCC(CostCenter cc) {
+        if (cc.getEnterprise() != null
+                && cc.getKey() != null
+                && cc.getCenterCostPlan() != null
                 && cc.getCostCenter() != null
                 && cc.getAccount() != null
                 && cc.getValue() != null
-                && cc.getValueType() != null){
-            Map<String,String> sqlChanges = new HashMap<>();
+                && cc.getValueType() != null) {
+            Map<String, String> sqlChanges = new HashMap<>();
             sqlChanges.put("enterprise", cc.getEnterprise().toString());
             sqlChanges.put("key", cc.getKey().toString());
             sqlChanges.put("centerCostPlan", cc.getCenterCostPlan().toString());
             sqlChanges.put("centerCost", cc.getCostCenter().toString());
             sqlChanges.put("valueType", cc.getValueType().toString());
             sqlChanges.put("value", cc.getValue().toPlainString());
-            
-            
+
             try {
                 Database.getDatabase().query(sql_InsertCostCenter, sqlChanges);
+
+                log
+                        .append("\n")
+                        .append("Inserido centro de custo ")
+                        .append(cc.getCostCenter())
+                        .append(" na chave ")
+                        .append(cc.getKey());
+
             } catch (SQLException ex) {
                 throw new Error(ex);
             }
-        }else{
+        } else {
             log.append("\n").append("O centro de custo não foi inserido para os parametros porque um deles está nulo: ");
             log.append("Empresa (").append(cc.getEnterprise()).append("), ");
             log.append("Chave (").append(cc.getKey()).append("), ");
