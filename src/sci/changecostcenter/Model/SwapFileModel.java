@@ -39,7 +39,7 @@ public class SwapFileModel {
 
                     //Se a linha só tiver números continua, se nao é cabeçalho
                     if (line.matches("[0-9;.,]+")) {
-                        String[] collumns = line.split(";");
+                        String[] collumns = line.split(";",-1);
 
                         //getInteger transforma em branco em null
                         Integer enterprise = Integer.parseInt(collumns[colEnterprise]);
@@ -70,7 +70,7 @@ public class SwapFileModel {
                         swaps.add(swap);
                     }
                 } catch (Exception e) {
-                    log.append("\n A seguinte linha do arquivo de trocas não foi inserida: ").append(line);
+                    log.append("\n Erro (").append(e.getMessage()).append(") na seguinte linha do arquivo de trocas não foi inserida:;").append(line);
                 }
             }
         }
