@@ -22,7 +22,12 @@ public class Controller {
 
         @Override
         public void run() {
-            File databseConfigFile = new File(ini.get("Config", "databaseCfgFilePath"));
+            File databseConfigFile;
+            try{
+                databseConfigFile = new File(ini.get("Config", "databaseCfgFilePath"));
+            }catch(NullPointerException nul){
+                databseConfigFile = new File("s");
+            }
 
             if (databseConfigFile.exists()) {
                 Database.setStaticObject(new Database(databseConfigFile));
@@ -43,8 +48,8 @@ public class Controller {
 
         @Override
         public void run() {
-            String sqlGetReferenceEntries = FileManager.getText(FileManager.getFile("\\sql\\getCCReferenceEntries.sql"));
-            String sqlDelete = FileManager.getText(FileManager.getFile("\\sql\\deleteCC.sql"));
+            String sqlGetReferenceEntries = FileManager.getText(FileManager.getFile("sql\\getCCReferenceEntries.sql"));
+            String sqlDelete = FileManager.getText(FileManager.getFile("sql\\deleteCC.sql"));
 
             //Lista empresas das trocas
             String enterprisesStr = ini.get("Config", "enterprises");

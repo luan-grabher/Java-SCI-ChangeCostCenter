@@ -17,15 +17,14 @@ public class SCIChangeCostCenter {
     public static StringBuilder log = new StringBuilder("");
     public static Ini ini = null;
     public static String reference;
+    private static String iniPath = null;
 
     public static void main(String[] args) {
         String name = "Zampieron trocar centros de custo ";
 
         try {
             //Start Ini file
-            String iniPath = Args.get(args, "ini");
-            iniPath = iniPath == null ? "zampieronCC.ini" : iniPath; //Se não tiver nos argumentos define como .ini
-            ini = new Ini(FileManager.getFile(iniPath));
+            iniPath = Args.get(args, "ini");
 
             String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");
             //Filtra números com 0 na frente ou não e uma casa com números de 0 à 9 ou números com 1 na frente seguido de 0,1 ou 2
@@ -47,13 +46,13 @@ public class SCIChangeCostCenter {
 
                         if (expensesFile.exists()) {
 
-                            if(JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                                    null, "O programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?"
-                                    , "Continuar?",JOptionPane.YES_NO_OPTION
-                            )){
+                            if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
+                                    null, "O programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
+                                     "Continuar?", JOptionPane.YES_NO_OPTION
+                            )) {
                                 //executa função principal
                                 mainFunction(name, month, year, swapsFile, expensesFile);
-                            }else{
+                            } else {
                                 JOptionPane.showMessageDialog(null, "Programa parado pelo usuário!", "Programa parado pelo usuário!", JOptionPane.ERROR_MESSAGE);
                             }
                         } else {
@@ -78,14 +77,17 @@ public class SCIChangeCostCenter {
         String str = "";
 
         try {
+            iniPath = iniPath == null ? "zampieronCC.ini" : iniPath; //Se não tiver nos argumentos define como .ini
+            ini = new Ini(FileManager.getFile(iniPath));
+
             reference = year + (month < 10 ? "0" : "") + month;
-            
+
             Controller controller = new Controller();
 
             //Inicia mapa
             Map<String, Executavel> execs = new LinkedHashMap();
 
-            execs.put("Definindo banco de dados",controller.new defineDatabase()); //Define o banco de dados estático
+            execs.put("Definindo banco de dados", controller.new defineDatabase()); //Define o banco de dados estático
             execs.put("Excluindo lançamentos de Centro de Custo da Referencia", controller.new deleteReferenceCCs());
             execs.put("Definindo trocas das despesas", controller.new setExpensesFile(expensesFile));
             execs.put("Definindo trocas do arquivo de trocas", controller.new setSwapsFile(swapsFile));

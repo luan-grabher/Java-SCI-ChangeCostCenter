@@ -38,7 +38,7 @@ public class Expense {
     }
 
     public void setCostCenterName(String costCenterName) {
-        this.costCenterName = costCenterName;
+        this.costCenterName = costCenterName.toLowerCase();
     }
 
     public Integer getCostCenter() {

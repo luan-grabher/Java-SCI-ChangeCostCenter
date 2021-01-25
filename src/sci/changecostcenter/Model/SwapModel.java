@@ -17,8 +17,8 @@ import sql.Database;
 
 public class SwapModel {
 
-    private static final String sql_GetContabilityEntries = FileManager.getText(FileManager.getFile("\\sql\\selectChangeCostCenterContabilityEntries.sql"));
-    private static final String sql_InsertCostCenter = FileManager.getText(FileManager.getFile("\\sql\\insertCostCenter.sql"));
+    private static final String sql_GetContabilityEntries = FileManager.getText(FileManager.getFile("sql\\selectChangeCostCenterContabilityEntries.sql"));
+    private static final String sql_InsertCostCenter = FileManager.getText(FileManager.getFile("sql\\insertCostCenter.sql"));
 
     /**
      * Recebe as trocas na sua lista de trocas. Percorre trocas e cria cc no
