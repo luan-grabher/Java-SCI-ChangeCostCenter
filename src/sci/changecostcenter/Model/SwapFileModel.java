@@ -20,13 +20,13 @@ public class SwapFileModel {
 
         if (file.exists() && !FileManager.getText(file).isBlank()) {
 
-            Integer colEnterprise = (Integer) cols.get("empresa");
-            Integer colCredit = (Integer) cols.get("credito");
-            Integer colDebit = (Integer) cols.get("debito");
-            Integer colCcDebit = (Integer) cols.get("cc debito");
-            Integer colCcCredit = (Integer) cols.get("cc credito");
-            Integer colValue = (Integer) cols.get("valor");
-            Integer colPercent = (Integer) cols.get("porcentagem");
+            Integer colEnterprise = Integer.getInteger(cols.get("empresa"));
+            Integer colCredit = Integer.getInteger(cols.get("credito"));
+            Integer colDebit = Integer.getInteger(cols.get("debito"));
+            Integer colCcDebit = Integer.getInteger(cols.get("cc debito"));
+            Integer colCcCredit = Integer.getInteger(cols.get("cc credito"));
+            Integer colValue = Integer.getInteger(cols.get("valor"));
+            Integer colPercent = Integer.getInteger(cols.get("porcentagem"));
 
             //Pega linhas do arquivo de texto
             String[] lines = FileManager.getText(file).split("\r\n");
