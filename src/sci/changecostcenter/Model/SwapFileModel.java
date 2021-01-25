@@ -20,13 +20,13 @@ public class SwapFileModel {
 
         if (file.exists() && !FileManager.getText(file).isBlank()) {
 
-            Integer colEnterprise = Integer.getInteger((String) cols.get("empresa"));
-            Integer colCredit = Integer.getInteger((String) cols.get("credito"));
-            Integer colDebit = Integer.getInteger((String) cols.get("debito"));
-            Integer colCcDebit = Integer.getInteger((String) cols.get("cc debito"));
-            Integer colCcCredit = Integer.getInteger((String) cols.get("cc credito"));
-            Integer colValue = Integer.getInteger((String) cols.get("valor"));
-            Integer colPercent = Integer.getInteger((String) cols.get("porcentagem"));
+            Integer colEnterprise = Integer.parseInt((String) cols.get("empresa"));
+            Integer colCredit = Integer.parseInt((String) cols.get("credito"));
+            Integer colDebit = Integer.parseInt((String) cols.get("debito"));
+            Integer colCcDebit = Integer.parseInt((String) cols.get("cc debito"));
+            Integer colCcCredit = Integer.parseInt((String) cols.get("cc credito"));
+            Integer colValue = Integer.parseInt((String) cols.get("valor"));
+            Integer colPercent = Integer.parseInt((String) cols.get("porcentagem"));
 
             //Pega linhas do arquivo de texto
             String[] lines = FileManager.getText(file).split("\r\n");
@@ -42,11 +42,11 @@ public class SwapFileModel {
                         String[] collumns = line.split(";");
 
                         //getInteger transforma em branco em null
-                        Integer enterprise = Integer.getInteger(collumns[colEnterprise]);
-                        Integer credit = Integer.getInteger(collumns[colCredit]);
-                        Integer debit = Integer.getInteger(collumns[colDebit]);
-                        Integer ccCredit = Integer.getInteger(collumns[colCcCredit]);
-                        Integer ccDebit = Integer.getInteger(collumns[colCcDebit]);
+                        Integer enterprise = Integer.parseInt(collumns[colEnterprise]);
+                        Integer credit = Integer.parseInt(collumns[colCredit]);
+                        Integer debit = Integer.parseInt(collumns[colDebit]);
+                        Integer ccCredit = Integer.parseInt(collumns[colCcCredit]);
+                        Integer ccDebit = Integer.parseInt(collumns[colCcDebit]);
                         BigDecimal value = collumns[colValue].equals("") ? null : new BigDecimal(brVal(collumns[colValue]));
                         BigDecimal percent = collumns[colPercent].equals("") ? null : new BigDecimal(brVal(collumns[colPercent]));
 
