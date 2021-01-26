@@ -1,5 +1,6 @@
 package sci.changecostcenter.Model;
 
+import SimpleView.Loading;
 import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.math.BigDecimal;
@@ -33,12 +34,27 @@ public class SwapModel {
     public static void addSwap(Swap swap) {
         swaps.add(swap);
     }
-    public static void addSwaps(List<Swap> swaps) {
-        swaps.addAll(swaps);
+
+    public static void addSwaps(List<Swap> swapsToAdd) {
+        swaps.addAll(swapsToAdd);
     }
 
     public static void insertCcForEachSwap() {
+        Map<String, Object> loading = new HashMap<>();
+        loading.put("obj", new Loading("Importando CCs", 0, swaps.size()));
+        loading.put("count", (Integer) 0);
+        loading.put("size", (Integer) swaps.size());
+
         swaps.forEach((swap) -> {
+            loading.put("count", (Integer) loading.get("count") + 1);
+            ((Loading) loading.get("loading"))
+                    .updateBar(
+                            (Integer) loading.get("count")
+                            + " de "
+                            + (Integer) loading.get("size"),
+                            (Integer) loading.get("count")
+                    );
+
             Map<String, String> usedFilter = new HashMap<>();
 
             Map<String, String> sqlSwaps = new HashMap<>();
@@ -64,7 +80,7 @@ public class SwapModel {
                 complementfilter.getHas().forEach((h, has) -> {
                     sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
                 });
-                complementfilter.getHas().forEach((hn, hasNot) -> {
+                complementfilter.getHasNot().forEach((hn, hasNot) -> {
                     sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
                 });
 
@@ -165,6 +181,8 @@ public class SwapModel {
                 });
             }
         });
+        
+        ((Loading) loading.get("loading")).dispose();
     }
 
     private static void insertCC(CostCenter cc) {

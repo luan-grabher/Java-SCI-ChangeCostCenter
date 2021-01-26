@@ -39,14 +39,14 @@ public class SwapFileModel {
 
                     //Se a linha só tiver números continua, se nao é cabeçalho
                     if (line.matches("[0-9;.,]+")) {
-                        String[] collumns = line.split(";",-1);
+                        String[] collumns = line.split(";", -1);
 
                         //getInteger transforma em branco em null
-                        Integer enterprise = Integer.parseInt(collumns[colEnterprise]);
-                        Integer credit = Integer.parseInt(collumns[colCredit]);
-                        Integer debit = Integer.parseInt(collumns[colDebit]);
-                        Integer ccCredit = Integer.parseInt(collumns[colCcCredit]);
-                        Integer ccDebit = Integer.parseInt(collumns[colCcDebit]);
+                        Integer enterprise = getIntOrNull(collumns[colEnterprise]);
+                        Integer credit = getIntOrNull(collumns[colCredit]);
+                        Integer debit = getIntOrNull(collumns[colDebit]);
+                        Integer ccCredit = getIntOrNull(collumns[colCcCredit]);
+                        Integer ccDebit = getIntOrNull(collumns[colCcDebit]);
                         BigDecimal value = collumns[colValue].equals("") ? null : new BigDecimal(brVal(collumns[colValue]));
                         BigDecimal percent = collumns[colPercent].equals("") ? null : new BigDecimal(brVal(collumns[colPercent]));
 
@@ -70,6 +70,7 @@ public class SwapFileModel {
                         swaps.add(swap);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log.append("\n Erro (").append(e.getMessage()).append(") na seguinte linha do arquivo de trocas não foi inserida:;").append(line);
                 }
             }
@@ -81,6 +82,24 @@ public class SwapFileModel {
         }
 
         return swaps;
+    }
+
+    /**
+     * Transforma string em integer.
+     * @param str Texto que será convertido em número
+     * @return Se for null, em branco ou menor que 0, retorna null.
+     */
+    private static Integer getIntOrNull(String str) {
+        if (str != null && !str.equals("")) {
+            try {
+                Integer number = Integer.parseInt(str);
+                if (number > 0) {
+                    return number;
+                }
+            } catch (Exception e) {
+            }
+        }
+        return null;
     }
 
     private static String brVal(String str) {

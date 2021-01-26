@@ -157,6 +157,7 @@ public class ExpenseModel {
 
                 //Cria troca
                 Swap swap = new Swap(); //Instancia troca
+                swap.setEnterprise(Integer.parseInt(ini.get("Config", "enterprise")));
                 swap.setComplementFilter(new StringFilter()); //Instancia filtro
                 swap.getComplementFilter().setHas(hasList); //Define o que o filtro deve possuir
 

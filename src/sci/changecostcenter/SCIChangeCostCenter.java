@@ -102,6 +102,8 @@ public class SCIChangeCostCenter {
             if (!"".equals(log.toString())) {
                 FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log.csv", log.toString());
                 JOptionPane.showMessageDialog(null, "Arquivo log.csv com LOG foi salvo na área de trabalho!");
+            }else{
+                JOptionPane.showMessageDialog(null, "O programa não gerou nenhum log, isso é um pouco estranho...", "Algo estranho aconteceu", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
