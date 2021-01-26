@@ -89,7 +89,7 @@ public class SCIChangeCostCenter {
 
             execs.put("Definindo banco de dados", controller.new defineDatabase()); //Define o banco de dados estático
             execs.put("Excluindo lançamentos de Centro de Custo da Referencia", controller.new deleteReferenceCCs());
-            execs.put("Definindo trocas das despesas", controller.new setExpensesFile(expensesFile));
+            //execs.put("Definindo trocas das despesas", controller.new setExpensesFile(expensesFile));
             execs.put("Definindo trocas do arquivo de trocas", controller.new setSwapsFile(swapsFile));
             execs.put("Importando para o banco de dados", controller.new importSwapsToDb());
 

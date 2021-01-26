@@ -13,7 +13,7 @@ public class Swap {
     private Integer accountCreditOrDebit = null;
     private Integer accountCredit = null;
     private Integer accountDebit = null;
-    
+
     //Filtros arquivo de despesas
     private StringFilter complementFilter = null;
     private String document = null;
@@ -79,7 +79,7 @@ public class Swap {
     }
 
     public void setValue(BigDecimal value) {
-        this.value = value.setScale(2, RoundingMode.HALF_DOWN);
+        this.value = value == null ? null : value.setScale(2, RoundingMode.HALF_DOWN);
     }
 
     public Integer getAccountCreditOrDebit() {

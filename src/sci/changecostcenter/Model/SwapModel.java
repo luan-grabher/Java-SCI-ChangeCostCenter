@@ -41,7 +41,7 @@ public class SwapModel {
 
     public static void insertCcForEachSwap() {
         Map<String, Object> loading = new HashMap<>();
-        loading.put("obj", new Loading("Importando CCs", 0, swaps.size()));
+        loading.put("loading", new Loading("Importando CCs", 0, swaps.size()));
         loading.put("count", (Integer) 0);
         loading.put("size", (Integer) swaps.size());
 
