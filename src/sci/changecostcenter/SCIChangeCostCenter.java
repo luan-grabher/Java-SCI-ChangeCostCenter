@@ -87,11 +87,11 @@ public class SCIChangeCostCenter {
             //Inicia mapa
             Map<String, Executavel> execs = new LinkedHashMap();
 
-            execs.put("Definindo banco de dados", controller.new defineDatabase()); //Define o banco de dados estático
-            execs.put("Excluindo lançamentos de Centro de Custo da Referencia", controller.new deleteReferenceCCs());
-            execs.put("Definindo trocas das despesas", controller.new setExpensesFile(expensesFile));
-            execs.put("Definindo trocas do arquivo de trocas", controller.new setSwapsFile(swapsFile));
-            execs.put("Importando para o banco de dados", controller.new importSwapsToDb());
+            execs.put("Definindo banco de dados " + reference, controller.new defineDatabase()); //Define o banco de dados estático
+            execs.put("Excluindo lançamentos de Centro de Custo da Referencia " + reference, controller.new deleteReferenceCCs());
+            execs.put("Definindo trocas das despesas " + reference, controller.new setExpensesFile(expensesFile));
+            execs.put("Definindo trocas do arquivo de trocas " + reference, controller.new setSwapsFile(swapsFile));
+            execs.put("Importando para o banco de dados " + reference, controller.new importSwapsToDb());
 
             Execution execution = new Execution(name);
             execution.setShowMessages(true);
@@ -100,8 +100,8 @@ public class SCIChangeCostCenter {
             execution.endExecution(true);
 
             if (!"".equals(log.toString())) {
-                FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log.csv", log.toString());
-                JOptionPane.showMessageDialog(null, "Arquivo log.csv com LOG foi salvo na área de trabalho!");
+                FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log " + reference + ".csv", log.toString());
+                JOptionPane.showMessageDialog(null, "Arquivo 'log " + reference + ".csv' com LOG foi salvo na área de trabalho!");
             }else{
                 JOptionPane.showMessageDialog(null, "O programa não gerou nenhum log, isso é um pouco estranho...", "Algo estranho aconteceu", JOptionPane.ERROR_MESSAGE);
             }
