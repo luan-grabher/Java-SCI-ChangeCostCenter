@@ -41,147 +41,156 @@ public class SwapModel {
 
     public static void insertCcForEachSwap() {
         Map<String, Object> loading = new HashMap<>();
-        loading.put("loading", new Loading("Importando CCs", 0, swaps.size()));
+        loading.put("loading", new Loading("Procurando CCs", 0, swaps.size()));
         loading.put("count", (Integer) 0);
         loading.put("size", (Integer) swaps.size());
+        try {
+            swaps.forEach((swap) -> {
+                loading.put("count", (Integer) loading.get("count") + 1);
+                ((Loading) loading.get("loading")).updateBar((Integer) loading.get("count"));
 
-        swaps.forEach((swap) -> {
-            loading.put("count", (Integer) loading.get("count") + 1);
-            ((Loading) loading.get("loading"))
-                    .updateBar(
-                            (Integer) loading.get("count")
-                            + " de "
-                            + (Integer) loading.get("size"),
-                            (Integer) loading.get("count")
-                    );
+                Map<String, String> usedFilter = new HashMap<>();
 
-            Map<String, String> usedFilter = new HashMap<>();
+                Map<String, String> sqlSwaps = new HashMap<>();
+                sqlSwaps.put("enterprise", swap.getEnterprise().toString());//Empresa
+                sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
+                sqlSwaps.put("reference", reference);
+                sqlSwaps.put("complement", "");//Plano Centro de Custo
 
-            Map<String, String> sqlSwaps = new HashMap<>();
-            sqlSwaps.put("enterprise", swap.getEnterprise().toString());//Empresa
-            sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
-            sqlSwaps.put("reference", reference);
-            sqlSwaps.put("complement", "");//Plano Centro de Custo
+                if (swap.getComplementFilter() != null) {//Filtro para o complemento
+                    //Cria variavel local
+                    StringFilter complementfilter = swap.getComplementFilter();
 
-            if (swap.getComplementFilter() != null) {//Filtro para o complemento
-                //Cria variavel local
-                StringFilter complementfilter = swap.getComplementFilter();
+                    //Mostra o filtro usado
+                    String hasFilter = "Complemento de Histórico que possua os termos: '"
+                            + complementfilter.printMap(complementfilter.getHas(), ", ") + "'";
+                    String hasNotFilter = "Complemento de Histórico que NÃO possua os termos: '"
+                            + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'";
+                    usedFilter.put(hasFilter, hasFilter);
+                    usedFilter.put(hasNotFilter, hasNotFilter);
 
-                //Mostra o filtro usado
-                String hasFilter = "Complemento de Histórico que possua os termos: '"
-                        + complementfilter.printMap(complementfilter.getHas(), ", ") + "'";
-                String hasNotFilter = "Complemento de Histórico que NÃO possua os termos: '"
-                        + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'";
-                usedFilter.put(hasFilter, hasFilter);
-                usedFilter.put(hasNotFilter, hasNotFilter);
+                    //Adicionar no complemento um AND para cada has e um AND para cada hasNot                                  
+                    StringBuilder sqlSwap = new StringBuilder();
+                    complementfilter.getHas().forEach((h, has) -> {
+                        sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
+                    });
+                    complementfilter.getHasNot().forEach((hn, hasNot) -> {
+                        sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
+                    });
 
-                //Adicionar no complemento um AND para cada has e um AND para cada hasNot                                  
-                StringBuilder sqlSwap = new StringBuilder();
-                complementfilter.getHas().forEach((h, has) -> {
-                    sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
-                });
-                complementfilter.getHasNot().forEach((hn, hasNot) -> {
-                    sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
-                });
+                    sqlSwaps.put("complement", sqlSwap.toString());
+                } else if (swap.getAccountCreditOrDebit() != null) {
+                    //Mostra filtro usado
+                    String filter = "Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit();
+                    usedFilter.put(filter, filter);
+                    //Filtro sql
+                    StringBuilder sqlSwap = new StringBuilder();
+                    sqlSwap
+                            .append(" AND (BDDEBITO = ")
+                            .append(swap.getAccountCreditOrDebit())
+                            .append(" OR BDCREDITO = ")
+                            .append(swap.getAccountCreditOrDebit())
+                            .append(")");
 
-                sqlSwaps.put("complement", sqlSwap.toString());
-            } else if (swap.getAccountCreditOrDebit() != null) {
-                //Mostra filtro usado
-                String filter = "Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit();
-                usedFilter.put(filter, filter);
-                //Filtro sql
-                StringBuilder sqlSwap = new StringBuilder();
-                sqlSwap
-                        .append(" AND (BDDEBITO = ")
-                        .append(swap.getAccountCreditOrDebit())
-                        .append(" OR BDCREDITO = ")
-                        .append(swap.getAccountCreditOrDebit())
-                        .append(")");
+                    sqlSwaps.put("account", sqlSwap.toString());
+                } else if (swap.getAccountCredit() != null) {
+                    //Mostra filtro usado
+                    String filter = "Conta de crédito igual a: " + swap.getAccountCredit();
+                    usedFilter.put(filter, filter);
+                    //Filtro sql
+                    StringBuilder sqlSwap = new StringBuilder();
+                    sqlSwap
+                            .append(" AND BDCREDITO = ")
+                            .append(swap.getAccountCredit());
 
-                sqlSwaps.put("account", sqlSwap.toString());
-            } else if (swap.getAccountCredit() != null) {
-                //Mostra filtro usado
-                String filter = "Conta de crédito igual a: " + swap.getAccountCredit();
-                usedFilter.put(filter, filter);
-                //Filtro sql
-                StringBuilder sqlSwap = new StringBuilder();
-                sqlSwap
-                        .append(" AND BDCREDITO = ")
-                        .append(swap.getAccountCredit());
+                    sqlSwaps.put("account", sqlSwap.toString());
+                } else if (swap.getAccountDebit() != null) {
+                    //Mostra filtro usado
+                    String filter = "Conta de débito igual a: " + swap.getAccountDebit();
+                    usedFilter.put(filter, filter);
+                    //Filtro sql
+                    StringBuilder sqlSwap = new StringBuilder();
+                    sqlSwap
+                            .append(" AND BDDEBITO = ")
+                            .append(swap.getAccountDebit());
 
-                sqlSwaps.put("account", sqlSwap.toString());
-            } else if (swap.getAccountDebit() != null) {
-                //Mostra filtro usado
-                String filter = "Conta de débito igual a: " + swap.getAccountDebit();
-                usedFilter.put(filter, filter);
-                //Filtro sql
-                StringBuilder sqlSwap = new StringBuilder();
-                sqlSwap
-                        .append(" AND BDCREDITO = ")
-                        .append(swap.getAccountDebit());
-
-                sqlSwaps.put("account", sqlSwap.toString());
-            }
-
-            //Cria variavel de lctos
-            List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
-
-            //Se não encontrar nenhum lcto
-            if (entries.isEmpty() && swap.getComplementFilter() != null && swap.getDocument() != null && swap.getValueFilter() != null) {
-                //Define o sqlSwap complement para o titulo(documento)
-                sqlSwaps.put("complement", " AND BDCOMPL LIKE '%" + swap.getDocument() + "%' ");
-                //Define o sqlSwap value para o valor
-                sqlSwaps.put("value", " AND BDVALOR = " + swap.getValueFilter().toPlainString());
-
-                //Mostra filtro usado
-                String filter = "Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValueFilter();
-                usedFilter.put(filter, filter);
-
-                //Procura Lctos
-                entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
-            }
-
-            //Se existirem lctos na variavel de lctos
-            if (!entries.isEmpty()) {
-                //Se tiver valor para inserir ou filtro de valor, exclui todos lançamentos menos so primeiro
-                if (swap.getValue() != null || swap.getValueFilter() != null) {
-                    while (entries.size() > 1) {
-                        entries.remove(entries.size() - 1);
-                    }
+                    sqlSwaps.put("account", sqlSwap.toString());
                 }
-                //Para cada lcto
-                entries.forEach((e) -> {
-                    //Cria objeto CC
-                    CostCenter cc = new CostCenter();
-                    cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));
-                    cc.setEnterprise(swap.getEnterprise());
-                    cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
-                    cc.setCostCenter(swap.getCostCenter(), swap.getValueType());
 
-                    //Se tiver o valor
-                    if (swap.getValue() != null) {
-                        //Define o valor
-                        cc.setValue(swap.getValue());
-                    } else if (swap.getPercent() != null) {
-                        //Se tiver porcentagem
-                        //Define o valor como a % do valor do lançamento
-                        BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
-                        cc.setValue(value.multiply(swap.getPercent()));
+                //Cria variavel de lctos
+                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
+
+                //Se não encontrar nenhum lcto
+                if (entries.isEmpty() && swap.getComplementFilter() != null && swap.getDocument() != null && swap.getValueFilter() != null) {
+                    //Define o sqlSwap complement para o titulo(documento)
+                    sqlSwaps.put("complement", " AND BDCOMPL LIKE '%" + swap.getDocument() + "%' ");
+                    //Define o sqlSwap value para o valor
+                    sqlSwaps.put("value", " AND BDVALOR = " + swap.getValueFilter().toPlainString());
+
+                    //Mostra filtro usado
+                    String filter = "Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValueFilter();
+                    usedFilter.put(filter, filter);
+
+                    //Procura Lctos
+                    entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
+                }
+
+                //Se existirem lctos na variavel de lctos
+                if (!entries.isEmpty()) {
+                    //Se tiver valor para inserir ou filtro de valor, exclui todos lançamentos menos so primeiro
+                    if (swap.getValue() != null || swap.getValueFilter() != null) {
+                        while (entries.size() > 1) {
+                            entries.remove(entries.size() - 1);
+                        }
                     }
 
-                    //Insere o CC
-                    insertCC(cc);
-                });
-            } else {
-                //Se não existirem lctos na variavel de lctos
-                //****Mostra no log que não foi encontrado lctos para aquele filtro
-                log.append("\n\nNenhum lançamento encontrado para a procura: ");
-                usedFilter.forEach((f, filter) -> {
-                    log.append("\n").append(filter);
-                });
-            }
-        });
-        
+                    Map<String, Object> insertLoading = new HashMap<>();
+                    insertLoading.put("loading", new Loading("Importando CCs", 0, entries.size()));
+                    insertLoading.put("count", (Integer) 0);
+                    insertLoading.put("size", (Integer) entries.size());
+
+                    //Para cada lcto
+                    entries.forEach((e) -> {
+                        insertLoading.put("count", (Integer) insertLoading.get("count") + 1);
+                        ((Loading) insertLoading.get("loading")).updateBar((Integer) insertLoading.get("count"));
+
+                        //Cria objeto CC
+                        CostCenter cc = new CostCenter();
+                        cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));
+                        cc.setEnterprise(swap.getEnterprise());
+                        cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
+                        cc.setCostCenter(swap.getCostCenter(), swap.getValueType());
+
+                        //Se tiver o valor
+                        if (swap.getValue() != null) {
+                            //Define o valor
+                            cc.setValue(swap.getValue());
+                        } else if (swap.getPercent() != null) {
+                            //Se tiver porcentagem
+                            //Define o valor como a % do valor do lançamento
+                            BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
+                            cc.setValue(value.multiply(swap.getPercent()));
+                        }
+
+                        //Insere o CC
+                        insertCC(cc);                        
+                    });
+                    
+                    ((Loading) insertLoading.get("loading")).dispose();
+                } else {
+                    //Se não existirem lctos na variavel de lctos
+                    //****Mostra no log que não foi encontrado lctos para aquele filtro
+                    log.append("\n\nNenhum lançamento encontrado para a procura: ");
+                    usedFilter.forEach((f, filter) -> {
+                        log.append("\n").append(filter);
+                    });
+                }
+            });
+        } catch (Exception e) {
+            ((Loading) loading.get("loading")).dispose();
+            throw new Error(e);
+        }
+
         ((Loading) loading.get("loading")).dispose();
     }
 
