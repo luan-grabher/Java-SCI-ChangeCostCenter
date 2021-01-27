@@ -64,13 +64,16 @@ public class Controller {
                 sqlSwaps.put("reference", reference);
 
                 String keys = Database.getDatabase().select(sqlGetReferenceEntries, sqlSwaps).get(0)[0];
-                sqlSwaps.put("inClause", SQL.divideIn(keys, "BDCHAVE"));
+                
+                if(keys != null && !keys.equals("")){
+                    sqlSwaps.put("inClause", SQL.divideIn(keys, "BDCHAVE"));
 
-                try {
-                    //executa query sql com o arquivo sql
-                    Database.getDatabase().query(sqlDelete, sqlSwaps);
-                } catch (Exception e) {
-                    throw new Error(e);
+                    try {
+                        //executa query sql com o arquivo sql
+                        Database.getDatabase().query(sqlDelete, sqlSwaps);
+                    } catch (Exception e) {
+                        throw new Error(e);
+                    }
                 }
             }
 
