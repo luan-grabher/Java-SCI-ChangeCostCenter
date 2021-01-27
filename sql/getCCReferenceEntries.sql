@@ -1,6 +1,8 @@
 select
-    LIST(DISTINCT BDCHAVE)
+    LIST(DISTINCT L.BDCHAVE)
 from VSUC_EMPRESAS_TLAN L
+INNER JOIN vsuc_empresas_tlcc CC
+ON CC.bdcodemp = L.BDCODEMP AND CC.BDCHAVE = L.BDCHAVE
 WHERE 
 L.BDCODEMP = :enterprise
 AND L.BDREFERENCIA = ':reference'
