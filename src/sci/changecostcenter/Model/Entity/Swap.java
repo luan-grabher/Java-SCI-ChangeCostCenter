@@ -79,7 +79,7 @@ public class Swap {
     }
 
     public void setValue(BigDecimal value) {
-        this.value = value == null ? null : value.setScale(2, RoundingMode.HALF_DOWN);
+        this.value = value == null ? null : value.setScale(2, RoundingMode.HALF_UP);
     }
 
     public Integer getAccountCreditOrDebit() {

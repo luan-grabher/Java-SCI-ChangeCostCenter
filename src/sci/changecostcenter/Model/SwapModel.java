@@ -4,6 +4,7 @@ import SimpleView.Loading;
 import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -169,7 +170,7 @@ public class SwapModel {
                             //Se tiver porcentagem
                             //Define o valor como a % do valor do lançamento
                             BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
-                            cc.setValue(value.multiply(swap.getPercent()));
+                            cc.setValue(value.multiply(swap.getPercent()).setScale(2, RoundingMode.HALF_UP));
                         }
 
                         //Insere o CC
