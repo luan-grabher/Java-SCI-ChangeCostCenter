@@ -267,16 +267,16 @@ public class SwapModel {
                 sqlSwaps.put("account", account);
 
                 //Procura diferenças
-                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
+                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetIncorrectCCs, sqlSwaps);
                 
                 if (!entries.isEmpty()) {
                     //Para cada chave
                     entries.forEach((entry) -> {
                         Map<String,String> updateSwaps = new HashMap<>();
-                        sqlSwaps.put("enterprise", swap.getEnterprise().toString());
-                        sqlSwaps.put("key", entry.get("CHAVE").toString());
-                        sqlSwaps.put("difference", entry.get("DIFERENCA").toString());
-                        sqlSwaps.put("cc", swap.getCostCenter().toString());
+                        updateSwaps.put("enterprise", swap.getEnterprise().toString());
+                        updateSwaps.put("key", entry.get("CHAVE").toString());
+                        updateSwaps.put("difference", entry.get("DIFERENCA").toString());
+                        updateSwaps.put("cc", swap.getCostCenter().toString());
                         
                         //Atuliza valor no banco de um cc
                         try{

@@ -87,7 +87,9 @@ public class Swap {
     }
 
     public void setAccountCreditOrDebit(Integer accountCreditOrDebit) {
-        account = accountCreditOrDebit;
+        if(accountCreditOrDebit != null){
+            account = accountCreditOrDebit;
+        }
         this.accountCreditOrDebit = accountCreditOrDebit;
     }
 
@@ -96,7 +98,9 @@ public class Swap {
     }
 
     public void setAccountCredit(Integer accountCredit) {
-        account = accountCredit;
+        if(accountCredit != null){
+            account = accountCredit;
+        }
         this.accountCredit = accountCredit;
     }
 
@@ -105,7 +109,9 @@ public class Swap {
     }
 
     public void setAccountDebit(Integer accountDebit) {
-        account = accountDebit;
+        if(accountDebit != null){
+            account = accountDebit;
+        }
         this.accountDebit = accountDebit;
     }
 
