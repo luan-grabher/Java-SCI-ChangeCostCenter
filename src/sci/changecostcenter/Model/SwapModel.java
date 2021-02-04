@@ -169,8 +169,8 @@ public class SwapModel {
                         } else if (swap.getPercent() != null) {
                             //Se tiver porcentagem
                             //Define o valor como a % do valor do lançamento
-                            BigDecimal value = new BigDecimal(e.get("BDVALOR").toString());
-                            cc.setValue(value.multiply(swap.getPercent()).setScale(2, RoundingMode.HALF_UP));
+                            BigDecimal value = (new BigDecimal(e.get("BDVALOR").toString())).setScale(4, RoundingMode.HALF_UP);
+                            cc.setValue(value.multiply(swap.getPercent()));
                         }
 
                         //Insere o CC

@@ -63,7 +63,7 @@ public class Swap {
     }
 
     public void setPercent(BigDecimal percent) {
-        this.percent = percent;
+        this.percent = percent  == null ? null : percent.setScale(4, RoundingMode.HALF_UP);
     }
 
     public String getDocument() {
@@ -79,7 +79,7 @@ public class Swap {
     }
 
     public void setValue(BigDecimal value) {
-        this.value = value == null ? null : value.setScale(2, RoundingMode.HALF_UP);
+        this.value = value == null ? null : value.setScale(4, RoundingMode.HALF_UP);
     }
 
     public Integer getAccountCreditOrDebit() {

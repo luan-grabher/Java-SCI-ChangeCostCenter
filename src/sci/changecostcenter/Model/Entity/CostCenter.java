@@ -1,6 +1,7 @@
 package sci.changecostcenter.Model.Entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CostCenter {
 
@@ -54,7 +55,7 @@ public class CostCenter {
     }
 
     public BigDecimal getValue() {
-        return value;
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
 
     public void setValue(BigDecimal value) {
