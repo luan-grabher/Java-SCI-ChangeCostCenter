@@ -55,7 +55,7 @@ public class CostCenter {
     }
 
     public BigDecimal getValue() {
-        return value.setScale(2, RoundingMode.HALF_UP);
+        return value.setScale(4, RoundingMode.HALF_UP);
     }
 
     public void setValue(BigDecimal value) {
