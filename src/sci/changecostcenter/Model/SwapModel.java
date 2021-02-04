@@ -21,6 +21,8 @@ public class SwapModel {
 
     private static final String sql_GetContabilityEntries = FileManager.getText(FileManager.getFile("sql\\selectChangeCostCenterContabilityEntries.sql"));
     private static final String sql_InsertCostCenter = FileManager.getText(FileManager.getFile("sql\\insertCostCenter.sql"));
+    private static final String sql_GetIncorrectCCs = FileManager.getText(FileManager.getFile("sql\\getIncorrectCCs.sql"));
+    private static final String sql_UpdateCCVal = FileManager.getText(FileManager.getFile("sql\\updateCCVal.sql"));
 
     /**
      * Recebe as trocas na sua lista de trocas. Percorre trocas e cria cc no
@@ -174,9 +176,9 @@ public class SwapModel {
                         }
 
                         //Insere o CC
-                        insertCC(cc);                        
+                        insertCC(cc);
                     });
-                    
+
                     ((Loading) insertLoading.get("loading")).dispose();
                 } else {
                     //Se não existirem lctos na variavel de lctos
@@ -232,5 +234,59 @@ public class SwapModel {
             log.append("Valor (").append(cc.getValue().toPlainString()).append("), ");
             log.append("Tipo do valor (").append(cc.getValueType()).append("), ");
         }
+    }
+
+    /**
+     * Procura centros de custo de porcentagem que quando inseridos ficaram com
+     * diferença de 1 centavo negativo. Para cada Chave com diferença, procura o
+     * cc equivalente e altera o valor do primeiro cc adicionando o valor da
+     * diferença
+     */
+    public static void correctCCs() {
+        Map<Integer, Integer> verifiedAccounts = new HashMap<>();
+        Map<String, String> sqlSwaps = new HashMap<>();
+        sqlSwaps.put("reference", reference);
+
+        swaps.forEach((swap) -> {
+            //Se tiver conta, não for verificada ainda e tiver percentual
+            if (swap.getAccount() != null
+                    && !verifiedAccounts.containsKey(swap.getAccount())
+                    && swap.getPercent() != null) {
+                verifiedAccounts.put(swap.getAccount(), swap.getAccount());
+
+                sqlSwaps.put("enterprise", swap.getEnterprise().toString());
+
+                //Account
+                String account = " AND BD";
+                if (swap.getValueType().equals(CostCenter.TYPE_CREDIT)) {
+                    account += "CREDITO = ";
+                } else {
+                    account += "DEBITO = ";
+                }
+                account += swap.getAccount() + " ";
+                sqlSwaps.put("account", account);
+
+                //Procura diferenças
+                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
+                
+                if (!entries.isEmpty()) {
+                    //Para cada chave
+                    entries.forEach((entry) -> {
+                        Map<String,String> updateSwaps = new HashMap<>();
+                        sqlSwaps.put("enterprise", swap.getEnterprise().toString());
+                        sqlSwaps.put("key", entry.get("CHAVE").toString());
+                        sqlSwaps.put("difference", entry.get("DIFERENCA").toString());
+                        sqlSwaps.put("cc", swap.getCostCenter().toString());
+                        
+                        //Atuliza valor no banco de um cc
+                        try{
+                            Database.getDatabase().query(sql_UpdateCCVal, updateSwaps);
+                        }catch(Exception e){
+                            throw new Error(e);
+                        }
+                    });
+                }
+            }
+        });
     }
 }

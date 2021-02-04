@@ -122,6 +122,7 @@ public class Controller {
         @Override
         public void run() {
             SwapModel.insertCcForEachSwap();
+            SwapModel.correctCCs();
         }
     }
 }

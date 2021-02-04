@@ -1,0 +1,6 @@
+UPDATE VSUC_EMPRESAS_TLCC
+SET BDVALOR = BDVALOR + :difference
+WHERE
+BDCODEMP = :enterprise
+BDCHAVE = :key
+BDCODTPCC = :cc
