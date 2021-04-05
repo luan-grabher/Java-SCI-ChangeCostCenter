@@ -21,6 +21,7 @@ public class SwapFileModel {
         if (file.exists() && !FileManager.getText(file).isBlank()) {
 
             Integer colEnterprise = Integer.parseInt((String) cols.get("empresa"));
+            Integer colHist = Integer.parseInt((String) cols.get("historico"));
             Integer colCredit = Integer.parseInt((String) cols.get("credito"));
             Integer colDebit = Integer.parseInt((String) cols.get("debito"));
             Integer colCcDebit = Integer.parseInt((String) cols.get("cc debito"));
@@ -43,6 +44,7 @@ public class SwapFileModel {
 
                         //getInteger transforma em branco em null
                         Integer enterprise = getIntOrNull(collumns[colEnterprise]);
+                        String hist = collumns[colHist].equals("")?null:collumns[colHist];
                         Integer credit = getIntOrNull(collumns[colCredit]);
                         Integer debit = getIntOrNull(collumns[colDebit]);
                         Integer ccCredit = getIntOrNull(collumns[colCcCredit]);
@@ -61,10 +63,12 @@ public class SwapFileModel {
                         //Se tiver conta nos dois e a conta for igual
                         if (credit != null && credit.equals(debit)) {
                             swap.setAccountCreditOrDebit(ccCredit);
-                        } else {
+                        } else if(credit != null || debit != null){
                             //Se não define as contas de credito e debito
                             swap.setAccountCredit(credit);
                             swap.setAccountDebit(debit);
+                        }else if(hist != null){
+                            swap.setComplementFilter(hist);
                         }
 
                         swaps.add(swap);
