@@ -20,7 +20,7 @@ public class SCIChangeCostCenter {
     private static String iniPath = null;
 
     public static void main(String[] args) {
-        String name = "Zampieron trocar centros de custo ";
+        String name = "Alterar / Inserir centros de custo ";
 
         try {
             //Start Ini file
