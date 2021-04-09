@@ -1,25 +1,16 @@
 package testPack;
 
 import fileManager.FileManager;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import sci.changecostcenter.SCIChangeCostCenter;
-import static sci.changecostcenter.SCIChangeCostCenter.ini;
-import static sci.changecostcenter.SCIChangeCostCenter.reference;
 import sql.Database;
 import sql.SQL;
 
 public class testMain {
 
     public static void main(String[] args) {
-        deleteCCs("06");
-        deleteCCs("07");
-        deleteCCs("08");
-        deleteCCs("09");
-        deleteCCs("10");
-        deleteCCs("11");
-        deleteCCs("12");
+        mainFunction();
     }
 
     public static void deleteCCs(String mes) {
@@ -58,17 +49,8 @@ public class testMain {
     }
 
     public static void mainFunction() {
-        Integer month = 6;
-        Integer year = 2020;
-
-        String name = "Teste";
-
-        File folder = new File("D:\\NetBeansProjects\\Java-SCI-ChangeCostCenter\\test");
-
-        File swapsFile = new File(folder.getAbsolutePath() + "\\trocas.csv");
-        File expensesFile = new File(folder.getAbsolutePath() + "\\despesas.xlsx");
-
-        System.out.println(SCIChangeCostCenter.mainFunction(name, month, year, swapsFile, expensesFile));
+        String[] args = new String[]{"mgmCC.ini"};
+        SCIChangeCostCenter.main(args);
     }
 
 }

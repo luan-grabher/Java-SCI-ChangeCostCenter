@@ -36,6 +36,8 @@ public class SCIChangeCostCenter {
                         "Exemplo Arquivo de Trocas CC.csv",
                         FileManager.getText(FileManager.getFile("./trocasCC.csv"))
                 );
+                
+                JOptionPane.showMessageDialog(null, "Arquivo salvo na área de trabalho!");
             } else {
 
                 //Start Ini file

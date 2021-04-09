@@ -45,7 +45,7 @@ public class SwapFileModel {
 
                         //getInteger transforma em branco em null
                         Integer enterprise = getIntOrNull(collumns[colEnterprise]);
-                        String hist = collumns[colHist].equals("")?null:collumns[colHist];
+                        String hist = collumns[colHist].equals("") ? null : collumns[colHist];
                         Integer credit = getIntOrNull(collumns[colCredit]);
                         Integer debit = getIntOrNull(collumns[colDebit]);
                         Integer ccCredit = getIntOrNull(collumns[colCcCredit]);
@@ -63,12 +63,17 @@ public class SwapFileModel {
 
                         //Se tiver conta nos dois e a conta for igual
                         if (credit != null && credit.equals(debit)) {
+                            //Define filtro nas duas contas
                             swap.setAccountCreditOrDebit(ccCredit);
-                        } else if(credit != null || debit != null){
-                            //Se não define as contas de credito e debito
+                        } //Se tiver filtro de conta de credito ou debito
+                        else if (credit != null || debit != null) {
+                            //Define filtro na conta de credito e de debito
                             swap.setAccountCredit(credit);
                             swap.setAccountDebit(debit);
-                        }else if(hist != null){
+                        }
+
+                        //Se tiver filtro de historico
+                        if (hist != null) {
                             swap.setComplementFilter(new StringFilter(hist.replaceAll(" ", ";")));
                         }
 
@@ -91,6 +96,7 @@ public class SwapFileModel {
 
     /**
      * Transforma string em integer.
+     *
      * @param str Texto que será convertido em número
      * @return Se for null, em branco ou menor que 0, retorna null.
      */
