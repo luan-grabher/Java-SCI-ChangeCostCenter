@@ -4,7 +4,6 @@ import Entity.Executavel;
 import Executor.Execution;
 import fileManager.Args;
 import fileManager.FileManager;
-import fileManager.Selector;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,51 +22,61 @@ public class SCIChangeCostCenter {
         String name = "Alterar / Inserir centros de custo ";
 
         try {
-            //Start Ini file
-            iniPath = Args.get(args, "ini");
 
-            String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");
-            //Filtra números com 0 na frente ou não e uma casa com números de 0 à 9 ou números com 1 na frente seguido de 0,1 ou 2
-            if (monthString.matches("(0?[1-9]|1[012])")) {
-                Integer month = Integer.valueOf(monthString);
+            int choice = SimpleView.View.chooseButton(
+                    "Escolha:",
+                    new String[]{
+                        "Baixar arquivo de trocas CC exemplo",
+                        "Inserir CCs"
+                    });
 
-                String yearString = JOptionPane.showInputDialog("Por favor insira o ANO:");
-                //Filtra números que começam com 2 seguidos de 3 casas com números de 0  a 9
-                if (yearString.matches("[2][0-9][0-9][0-9]")) {
-                    Integer year = Integer.valueOf(yearString);
+            if (choice == 0) {
+                FileManager.save(
+                        new File(System.getProperty("user.home") + "/Desktop"), //desktop
+                        "Exemplo Arquivo de Trocas CC.csv",
+                        FileManager.getText(FileManager.getFile("./trocasCC.csv"))
+                );
+            } else {
 
-                    //Escolhe arquivo de trocas CSV
-                    JOptionPane.showMessageDialog(null, "Por favor escolha o arquivo de trocas de lançamentos únicos CSV:");
-                    File swapsFile = Selector.selectFile("", "Arquivo de trocas CSV", "csv");
-                    //Se arquivo existir, continua a execução, se não exibe erro
-                    if (swapsFile.exists()) {
-                        JOptionPane.showMessageDialog(null, "Por favor escolha o arquivo de Despesas XLSX:");
-                        File expensesFile = Selector.selectFile("", "Arquivo de Despesas XLSX", "xlsx");
+                //Start Ini file
+                iniPath = Args.get(args, "ini");
+                iniPath = iniPath == null ? "mgmCC.ini" : iniPath; //Se não tiver nos argumentos define como .ini
+                ini = new Ini(FileManager.getFile(iniPath));
 
-                        if (expensesFile.exists()) {
+                String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");
+                //Filtra números com 0 na frente ou não e uma casa com números de 0 à 9 ou números com 1 na frente seguido de 0,1 ou 2
+                if (monthString.matches("(0?[1-9]|1[012])")) {
+                    Integer month = Integer.valueOf(monthString);
 
-                            if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                                    null, "O programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
-                                     "Continuar?", JOptionPane.YES_NO_OPTION
-                            )) {
-                                //executa função principal
-                                mainFunction(name, month, year, swapsFile, expensesFile);
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Programa parado pelo usuário!", "Programa parado pelo usuário!", JOptionPane.ERROR_MESSAGE);
-                            }
+                    String yearString = JOptionPane.showInputDialog("Por favor insira o ANO:");
+                    //Filtra números que começam com 2 seguidos de 3 casas com números de 0  a 9
+                    if (yearString.matches("[2][0-9][0-9][0-9]")) {
+                        Integer year = Integer.valueOf(yearString);
+
+                        //Escolhe arquivo de trocas CSV
+                        File swapsFile = FileManager.getFileFromUser("Arquivo de Trocas de CC", "csv");
+
+                        File expenseFile = null;
+                        if ("true".equals(ini.get("Config", "despesas"))) {
+                            expenseFile = FileManager.getFileFromUser("Arquivo de despesas", "xlsx");
+                        }
+
+                        if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
+                                null, "O programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
+                                "Continuar?", JOptionPane.YES_NO_OPTION
+                        )) {
+                            //executa função principal
+                            mainFunction(name, month, year, swapsFile, expenseFile);
                         } else {
-                            JOptionPane.showMessageDialog(null, "Arquivo de Despesas inválido!", "Arquivo de Despesas inválido!", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "Programa parado pelo usuário!", "Programa parado pelo usuário!", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(null, "Arquivo de trocas inválido!", "Arquivo de trocas inválido!", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Ano inválido!", "Ano inválido!", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Ano inválido!", "Ano inválido!", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Mês inválido!", "Mês inválido!", JOptionPane.ERROR_MESSAGE);
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "Mês inválido!", "Mês inválido!", JOptionPane.ERROR_MESSAGE);
             }
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Ocorreu um erro Java: " + e, "Erro Java", JOptionPane.ERROR_MESSAGE);
         }
@@ -77,8 +86,6 @@ public class SCIChangeCostCenter {
         String str = "";
 
         try {
-            iniPath = iniPath == null ? "zampieronCC.ini" : iniPath; //Se não tiver nos argumentos define como .ini
-            ini = new Ini(FileManager.getFile(iniPath));
 
             reference = year + (month < 10 ? "0" : "") + month;
 
@@ -89,7 +96,11 @@ public class SCIChangeCostCenter {
 
             execs.put("Definindo banco de dados " + reference, controller.new defineDatabase()); //Define o banco de dados estático
             execs.put("Excluindo lançamentos de Centro de Custo da Referencia " + reference, controller.new deleteReferenceCCs());
-            execs.put("Definindo trocas das despesas " + reference, controller.new setExpensesFile(expensesFile));
+
+            if (expensesFile != null) {
+                execs.put("Definindo trocas das despesas " + reference, controller.new setExpensesFile(expensesFile));
+            }
+
             execs.put("Definindo trocas do arquivo de trocas " + reference, controller.new setSwapsFile(swapsFile));
             execs.put("Importando para o banco de dados " + reference, controller.new importSwapsToDb());
 
@@ -102,7 +113,7 @@ public class SCIChangeCostCenter {
             if (!"".equals(log.toString())) {
                 FileManager.save(new File(System.getProperty("user.home")) + "\\Desktop\\log " + reference + ".csv", log.toString());
                 JOptionPane.showMessageDialog(null, "Arquivo 'log " + reference + ".csv' com LOG foi salvo na área de trabalho!");
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(null, "O programa não gerou nenhum log, isso é um pouco estranho...", "Algo estranho aconteceu", JOptionPane.ERROR_MESSAGE);
             }
 
@@ -114,4 +125,5 @@ public class SCIChangeCostCenter {
 
         return str;
     }
+
 }

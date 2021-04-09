@@ -2,6 +2,7 @@ package sci.changecostcenter.Model;
 
 import Entity.ErrorIgnore;
 import fileManager.FileManager;
+import fileManager.StringFilter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class SwapFileModel {
                             swap.setAccountCredit(credit);
                             swap.setAccountDebit(debit);
                         }else if(hist != null){
-                            swap.setComplementFilter(hist);
+                            swap.setComplementFilter(new StringFilter(hist.replaceAll(" ", ";")));
                         }
 
                         swaps.add(swap);
