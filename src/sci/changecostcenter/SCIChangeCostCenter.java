@@ -36,14 +36,14 @@ public class SCIChangeCostCenter {
                         "Exemplo Arquivo de Trocas CC.csv",
                         FileManager.getText(FileManager.getFile("./trocasCC.csv"))
                 );
-                
+
                 JOptionPane.showMessageDialog(null, "Arquivo salvo na área de trabalho!");
             } else {
 
                 //Start Ini file
                 iniPath = Args.get(args, "ini");
-                iniPath = iniPath == null ? "mgmCC.ini" : iniPath; //Se não tiver nos argumentos define como .ini
-                ini = new Ini(FileManager.getFile(iniPath));
+                iniPath = iniPath == null ? "mgmCC" : iniPath; //Se não tiver nos argumentos define como .ini
+                ini = new Ini(FileManager.getFile(iniPath + ".ini"));
 
                 String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");
                 //Filtra números com 0 na frente ou não e uma casa com números de 0 à 9 ou números com 1 na frente seguido de 0,1 ou 2
@@ -64,7 +64,7 @@ public class SCIChangeCostCenter {
                         }
 
                         if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                                null, "O programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
+                                null,"Usando a configuração: " + iniPath + "\nO programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
                                 "Continuar?", JOptionPane.YES_NO_OPTION
                         )) {
                             //executa função principal
