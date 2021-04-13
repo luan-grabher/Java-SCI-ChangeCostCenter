@@ -1,6 +1,7 @@
 package testPack;
 
 import fileManager.FileManager;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ import sql.SQL;
 public class testMain {
 
     public static void main(String[] args) {
-        mainFunction();
+        testWithFiles();
     }
 
     public static void deletefirstList() {
@@ -74,6 +75,15 @@ public class testMain {
                 }
             }
         }
+    }
+    
+    public static void testWithFiles(){
+        Integer month = 7;
+        Integer year = 7;
+        File swapsFile = new File("D:\\Downloads\\cc072020.csv");
+        File expensesFile = new File("D:\\Downloads\\despesas072020.xlsx");
+        
+        SCIChangeCostCenter.mainFunction("Teste", month, year, swapsFile, expensesFile);
     }
 
     public static void mainFunction() {

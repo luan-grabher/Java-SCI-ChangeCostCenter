@@ -59,6 +59,7 @@ public class SwapModel {
                 sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
                 sqlSwaps.put("reference", reference);
                 sqlSwaps.put("complement", "");//Plano Centro de Custo
+                sqlSwaps.put("first1","");
 
                 if (swap.getComplementFilter() != null) {//Filtro para o complemento
                     //Cria variavel local
@@ -118,6 +119,11 @@ public class SwapModel {
                             .append(swap.getAccountDebit());
 
                     sqlSwaps.put("account", sqlSwap.toString());
+                }
+                
+                //Pega somente primeiro se for pra inserir valor ou tiver filtro de valor
+                if(swap.getValue() != null || swap.getValueFilter() != null){
+                    sqlSwaps.put("first1","FIRST 1 ");
                 }
 
                 //Cria variavel de lctos

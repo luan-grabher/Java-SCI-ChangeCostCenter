@@ -1,4 +1,5 @@
 select
+    :first1
     BDCHAVE,
     BDVALOR
 from VSUC_EMPRESAS_TLAN L
