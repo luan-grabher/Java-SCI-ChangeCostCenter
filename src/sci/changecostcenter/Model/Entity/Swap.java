@@ -3,10 +3,12 @@ package sci.changecostcenter.Model.Entity;
 import fileManager.StringFilter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_CREDIT;
-import static sci.changecostcenter.Model.Entity.CostCenter.TYPE_DEBIT;
 
 public class Swap {
+
+    /*DEBITO(0) E CREDITO(1)*/
+    public static final Integer TYPE_DEBIT = 0;
+    public static final Integer TYPE_CREDIT = 1;
 
     //Filtros arquivo de trocas
     private Integer enterprise = null;
@@ -63,7 +65,7 @@ public class Swap {
     }
 
     public void setPercent(BigDecimal percent) {
-        this.percent = percent  == null ? null : percent.setScale(4, RoundingMode.HALF_UP);
+        this.percent = percent == null ? null : percent.setScale(4, RoundingMode.HALF_UP);
     }
 
     public String getDocument() {
@@ -87,7 +89,7 @@ public class Swap {
     }
 
     public void setAccountCreditOrDebit(Integer accountCreditOrDebit) {
-        if(accountCreditOrDebit != null){
+        if (accountCreditOrDebit != null) {
             account = accountCreditOrDebit;
         }
         this.accountCreditOrDebit = accountCreditOrDebit;
@@ -98,7 +100,7 @@ public class Swap {
     }
 
     public void setAccountCredit(Integer accountCredit) {
-        if(accountCredit != null){
+        if (accountCredit != null) {
             account = accountCredit;
         }
         this.accountCredit = accountCredit;
@@ -109,7 +111,7 @@ public class Swap {
     }
 
     public void setAccountDebit(Integer accountDebit) {
-        if(accountDebit != null){
+        if (accountDebit != null) {
             account = accountDebit;
         }
         this.accountDebit = accountDebit;

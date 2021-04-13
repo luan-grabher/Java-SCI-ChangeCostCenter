@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import sci.changecostcenter.Model.Entity.CostCenter;
 import sci.changecostcenter.Model.Entity.Swap;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
 import static sci.changecostcenter.SCIChangeCostCenter.log;
@@ -45,12 +44,11 @@ public class SwapModel {
     public static void insertCcForEachSwap() {
         Map<String, Object> loading = new HashMap<>();
         loading.put("loading", new Loading("Procurando CCs " + reference, 0, swaps.size()));
-        
+
         try {
             //Desativa fechamento automatico do banco
             Database.getDatabase().setAutoClose(false);
-            
-            
+
             swaps.forEach((swap) -> {
                 ((Loading) loading.get("loading")).next();
 
@@ -160,22 +158,22 @@ public class SwapModel {
                     entries.forEach((e) -> {
                         ((Loading) insertLoading.get("loading")).next();
 
-                        //Cria objeto CC
-                        CostCenter cc = new CostCenter();
-                        cc.setKey(Integer.valueOf(e.get("BDCHAVE").toString()));
-                        cc.setEnterprise(swap.getEnterprise());
-                        cc.setCenterCostPlan(Integer.valueOf(sqlSwaps.get("centerCostPlan")));
-                        cc.setCostCenter(swap.getCostCenter(), swap.getValueType());
+                        Map<String, String> cc = new HashMap<>();
+                        cc.put("enterprise", swap.getEnterprise().toString());
+                        cc.put("key", e.get("BDCHAVE").toString());
+                        cc.put("centerCostPlan", sqlSwaps.get("centerCostPlan"));
+                        cc.put("centerCost", swap.getCostCenter().toString());
+                        cc.put("valueType", swap.getValueType().toString());
 
                         //Se tiver o valor
                         if (swap.getValue() != null) {
                             //Define o valor
-                            cc.setValue(swap.getValue());
-                        } else if (swap.getPercent() != null) {
-                            //Se tiver porcentagem
+                            cc.put("value", swap.getValue().toPlainString());
+                        }//Se tiver porcentagem 
+                        else if (swap.getPercent() != null) {
                             //Define o valor como a % do valor do lançamento
                             BigDecimal value = (new BigDecimal(e.get("BDVALOR").toString())).setScale(4, RoundingMode.HALF_UP);
-                            cc.setValue(value.multiply(swap.getPercent()));
+                            cc.put("value", value.multiply(swap.getPercent()).toPlainString());
                         }
 
                         //Insere o CC
@@ -198,48 +196,42 @@ public class SwapModel {
         }
 
         ((Loading) loading.get("loading")).dispose();
-        
+
         //Fecha conexao com o banco de dados
         Database.getDatabase().setAutoClose(true);
         Database.getDatabase().close(true);
     }
 
-    private static void insertCC(CostCenter cc) {
-        if (cc.getEnterprise() != null
-                && cc.getKey() != null
-                && cc.getCenterCostPlan() != null
-                && cc.getCostCenter() != null
-                && cc.getValue() != null
-                && cc.getValueType() != null) {
-            Map<String, String> sqlChanges = new HashMap<>();
-            sqlChanges.put("enterprise", cc.getEnterprise().toString());
-            sqlChanges.put("key", cc.getKey().toString());
-            sqlChanges.put("centerCostPlan", cc.getCenterCostPlan().toString());
-            sqlChanges.put("centerCost", cc.getCostCenter().toString());
-            sqlChanges.put("valueType", cc.getValueType().toString());
-            sqlChanges.put("value", cc.getValue().toPlainString());
+    private static void insertCC(Map<String, String> cc) {
+        if (//Verifica se todos ampos estão ok
+                !"".equals(cc.getOrDefault("enterprise",""))
+                && !"".equals(cc.getOrDefault("key",""))
+                && !"".equals(cc.getOrDefault("centerCostPlan",""))
+                && !"".equals(cc.getOrDefault("centerCost",""))
+                && !"".equals(cc.getOrDefault("valueType",""))
+                && !"".equals(cc.getOrDefault("value",""))) {
 
             try {
-                Database.getDatabase().query(sql_InsertCostCenter, sqlChanges);
+                Database.getDatabase().query(sql_InsertCostCenter, cc);
 
                 log
                         .append("\n")
                         .append("Inserido centro de custo ")
-                        .append(cc.getCostCenter())
+                        .append(cc.get("centerCost"))
                         .append(" na chave ")
-                        .append(cc.getKey());
+                        .append(cc.get("key"));
 
             } catch (SQLException ex) {
                 throw new Error(ex);
             }
         } else {
             log.append("\n").append("O centro de custo não foi inserido para os parametros porque um deles está nulo: ");
-            log.append("Empresa (").append(cc.getEnterprise()).append("), ");
-            log.append("Chave (").append(cc.getKey()).append("), ");
-            log.append("CC Plano (").append(cc.getCenterCostPlan()).append("), ");
-            log.append("CC (").append(cc.getCostCenter()).append("), ");
-            log.append("Valor (").append(cc.getValue().toPlainString()).append("), ");
-            log.append("Tipo do valor (").append(cc.getValueType()).append("), ");
+            log.append("Empresa (").append(cc.get("enterprise")).append("), ");
+            log.append("Chave (").append(cc.get("key")).append("), ");
+            log.append("CC Plano (").append(cc.get("centerCostPlan")).append("), ");
+            log.append("CC (").append(cc.get("costCenter")).append("), ");
+            log.append("Valor (").append(cc.get("value")).append("), ");
+            log.append("Tipo do valor (").append(cc.get("valueType")).append("), ");
         }
     }
 
@@ -265,7 +257,7 @@ public class SwapModel {
 
                 //Account
                 String account = " AND BD";
-                if (swap.getValueType().equals(CostCenter.TYPE_CREDIT)) {
+                if (swap.getValueType().equals(Swap.TYPE_CREDIT)) {
                     account += "CREDITO = ";
                 } else {
                     account += "DEBITO = ";
@@ -275,20 +267,20 @@ public class SwapModel {
 
                 //Procura diferenças
                 List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetIncorrectCCs, sqlSwaps);
-                
+
                 if (!entries.isEmpty()) {
                     //Para cada chave
                     entries.forEach((entry) -> {
-                        Map<String,String> updateSwaps = new HashMap<>();
+                        Map<String, String> updateSwaps = new HashMap<>();
                         updateSwaps.put("enterprise", swap.getEnterprise().toString());
                         updateSwaps.put("key", entry.get("CHAVE").toString());
                         updateSwaps.put("difference", entry.get("DIFERENCA").toString());
                         updateSwaps.put("cc", swap.getCostCenter().toString());
-                        
+
                         //Atuliza valor no banco de um cc
-                        try{
+                        try {
                             Database.getDatabase().query(sql_UpdateCCVal, updateSwaps);
-                        }catch(Exception e){
+                        } catch (Exception e) {
                             throw new Error(e);
                         }
                     });
