@@ -8,7 +8,6 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import sci.changecostcenter.Model.Entity.CostCenter;
@@ -48,6 +47,10 @@ public class SwapModel {
         loading.put("loading", new Loading("Procurando CCs " + reference, 0, swaps.size()));
         
         try {
+            //Desativa fechamento automatico do banco
+            Database.getDatabase().setAutoClose(false);
+            
+            
             swaps.forEach((swap) -> {
                 ((Loading) loading.get("loading")).next();
 
@@ -195,6 +198,10 @@ public class SwapModel {
         }
 
         ((Loading) loading.get("loading")).dispose();
+        
+        //Fecha conexao com o banco de dados
+        Database.getDatabase().setAutoClose(true);
+        Database.getDatabase().close(true);
     }
 
     private static void insertCC(CostCenter cc) {
