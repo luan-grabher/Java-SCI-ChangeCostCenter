@@ -204,12 +204,12 @@ public class SwapModel {
 
     private static void insertCC(Map<String, String> cc) {
         if (//Verifica se todos ampos estão ok
-                !"".equals(cc.getOrDefault("enterprise",""))
-                && !"".equals(cc.getOrDefault("key",""))
-                && !"".equals(cc.getOrDefault("centerCostPlan",""))
-                && !"".equals(cc.getOrDefault("centerCost",""))
-                && !"".equals(cc.getOrDefault("valueType",""))
-                && !"".equals(cc.getOrDefault("value",""))) {
+                !"".equals(cc.getOrDefault("enterprise", ""))
+                && !"".equals(cc.getOrDefault("key", ""))
+                && !"".equals(cc.getOrDefault("centerCostPlan", ""))
+                && !"".equals(cc.getOrDefault("centerCost", ""))
+                && !"".equals(cc.getOrDefault("valueType", ""))
+                && !"".equals(cc.getOrDefault("value", ""))) {
 
             try {
                 Database.getDatabase().query(sql_InsertCostCenter, cc);
@@ -246,7 +246,13 @@ public class SwapModel {
         Map<String, String> sqlSwaps = new HashMap<>();
         sqlSwaps.put("reference", reference);
 
+        //Loading
+        Map<String, Object> loading = new HashMap<>();
+        loading.put("loading", new Loading("Corrigindo CCs " + reference + " com diferença de 0,1", 0, swaps.size()));
+
         swaps.forEach((swap) -> {
+            ((Loading) loading.get("loading")).next();
+
             //Se tiver conta, não for verificada ainda e tiver percentual
             if (swap.getAccount() != null
                     && !verifiedAccounts.containsKey(swap.getAccount())
@@ -269,8 +275,14 @@ public class SwapModel {
                 List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetIncorrectCCs, sqlSwaps);
 
                 if (!entries.isEmpty()) {
+                    //Loading
+                    Map<String, Object> loadingEntries = new HashMap<>();
+                    loadingEntries.put("loading", new Loading("Corrigindo CCs no banco", 0, entries.size()));
+
                     //Para cada chave
                     entries.forEach((entry) -> {
+                        ((Loading) loadingEntries.get("loading")).next();
+                        
                         Map<String, String> updateSwaps = new HashMap<>();
                         updateSwaps.put("enterprise", swap.getEnterprise().toString());
                         updateSwaps.put("key", entry.get("CHAVE").toString());
@@ -284,8 +296,13 @@ public class SwapModel {
                             throw new Error(e);
                         }
                     });
+                    
+                    ((Loading) loadingEntries.get("loading")).dispose();
                 }
             }
         });
+
+        //Termina loading
+        ((Loading) loading.get("loading")).dispose();
     }
 }
