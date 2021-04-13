@@ -27,7 +27,8 @@ public class SCIChangeCostCenter {
                     "Escolha:",
                     new String[]{
                         "Baixar arquivo de trocas CC exemplo",
-                        "Inserir CCs"
+                        "Inserir CCs",
+                        "Excluir CCs"
                     });
 
             if (choice == 0) {
@@ -42,7 +43,7 @@ public class SCIChangeCostCenter {
 
                 //Start Ini file
                 iniPath = Args.get(args, "ini");
-                iniPath = iniPath == null ? "mgmCC" : iniPath; //Se não tiver nos argumentos define como .ini
+                iniPath = iniPath == null ? "zampieronCC" : iniPath; //Se não tiver nos argumentos define como .ini
                 ini = new Ini(FileManager.getFile(iniPath + ".ini"));
 
                 String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");
@@ -56,15 +57,21 @@ public class SCIChangeCostCenter {
                         Integer year = Integer.valueOf(yearString);
 
                         //Escolhe arquivo de trocas CSV
-                        File swapsFile = FileManager.getFileFromUser("Arquivo de Trocas de CC", "csv");
-
+                        File swapsFile = null;
                         File expenseFile = null;
-                        if ("true".equals(ini.get("Config", "despesas"))) {
-                            expenseFile = FileManager.getFileFromUser("Arquivo de despesas", "xlsx");
+                        
+                        //Se a opção escolhida for para importar ai seleciona os arquivos
+                        if(choice == 1){
+                            //Pega arquivo de cc
+                            swapsFile = FileManager.getFileFromUser("Arquivo de Trocas de CC", "csv");
+                            //Pega arquivo de despesas
+                            if ("true".equals(ini.get("Config", "despesas"))) {
+                                expenseFile = FileManager.getFileFromUser("Arquivo de despesas", "xlsx");
+                            }
                         }
 
                         if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                                null,"Usando a configuração: " + iniPath + "\nO programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
+                                null, "Usando a configuração: " + iniPath + "\nO programa irá apagar todos os centros de custo do mês " + month + "/" + year + ". Deseja continuar SIM(Yes) ou NÃO(Not)?",
                                 "Continuar?", JOptionPane.YES_NO_OPTION
                         )) {
                             //executa função principal
@@ -102,9 +109,13 @@ public class SCIChangeCostCenter {
             if (expensesFile != null) {
                 execs.put("Definindo trocas das despesas " + reference, controller.new setExpensesFile(expensesFile));
             }
+            if (swapsFile != null) {
+                execs.put("Definindo trocas do arquivo de trocas " + reference, controller.new setSwapsFile(swapsFile));
+            }
 
-            execs.put("Definindo trocas do arquivo de trocas " + reference, controller.new setSwapsFile(swapsFile));
-            execs.put("Importando para o banco de dados " + reference, controller.new importSwapsToDb());
+            if (swapsFile != null || expensesFile != null) {
+                execs.put("Importando para o banco de dados " + reference, controller.new importSwapsToDb());
+            }
 
             Execution execution = new Execution(name);
             execution.setShowMessages(true);
