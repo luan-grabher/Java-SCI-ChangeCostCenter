@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import sci.changecostcenter.Model.Entity.CostCenter;
@@ -45,12 +46,10 @@ public class SwapModel {
     public static void insertCcForEachSwap() {
         Map<String, Object> loading = new HashMap<>();
         loading.put("loading", new Loading("Procurando CCs " + reference, 0, swaps.size()));
-        loading.put("count", (Integer) 0);
-        loading.put("size", (Integer) swaps.size());
+        
         try {
             swaps.forEach((swap) -> {
-                loading.put("count", (Integer) loading.get("count") + 1);
-                ((Loading) loading.get("loading")).updateBar((Integer) loading.get("count"));
+                ((Loading) loading.get("loading")).next();
 
                 Map<String, String> usedFilter = new HashMap<>();
 
@@ -140,22 +139,23 @@ public class SwapModel {
 
                 //Se existirem lctos na variavel de lctos
                 if (!entries.isEmpty()) {
-                    //Se tiver valor para inserir ou filtro de valor, exclui todos lançamentos menos so primeiro
-                    if (swap.getValue() != null || swap.getValueFilter() != null) {
-                        while (entries.size() > 1) {
-                            entries.remove(entries.size() - 1);
-                        }
+                    //Se tiver valor para inserir ou filtro de valor
+                    if (entries.size() > 1 && swap.getValue() != null || swap.getValueFilter() != null) {
+                        //exclui todos lançamentos menos so primeiro
+                        //grava o primeiro
+                        Map<String, Object> entry = entries.get(0);
+                        //Exclui o resto
+                        entries.clear();
+                        //coloca nas entradas a primeira entrada
+                        entries.add(entry);
                     }
 
                     Map<String, Object> insertLoading = new HashMap<>();
                     insertLoading.put("loading", new Loading("Importando CCs " + reference, 0, entries.size()));
-                    insertLoading.put("count", (Integer) 0);
-                    insertLoading.put("size", (Integer) entries.size());
 
                     //Para cada lcto
                     entries.forEach((e) -> {
-                        insertLoading.put("count", (Integer) insertLoading.get("count") + 1);
-                        ((Loading) insertLoading.get("loading")).updateBar((Integer) insertLoading.get("count"));
+                        ((Loading) insertLoading.get("loading")).next();
 
                         //Cria objeto CC
                         CostCenter cc = new CostCenter();

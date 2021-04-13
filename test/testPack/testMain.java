@@ -1,8 +1,11 @@
 package testPack;
 
 import fileManager.FileManager;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import sci.changecostcenter.Model.Entity.CostCenter;
 import sci.changecostcenter.SCIChangeCostCenter;
 import sql.Database;
 import sql.SQL;
@@ -11,6 +14,32 @@ public class testMain {
 
     public static void main(String[] args) {
         mainFunction();
+    }
+
+    public static void deletefirstList() {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        
+        //Mapas
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("cod", 1);
+        
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("cod", 2);
+        
+        Map<String, Object> map3 = new HashMap<>();
+        map3.put("cod", 3);
+        
+        lista.add(map1);
+        lista.add(map2);
+        lista.add(map3);
+
+        Map<String, Object> entry = lista.get(0);
+        //Exclui o resto
+        lista.clear();
+        //coloca nas entradas a primeira entrada
+        lista.add(entry);
+        
+        System.out.println("aaa");
     }
 
     public static void deleteCCs(String mes) {
@@ -49,7 +78,7 @@ public class testMain {
     }
 
     public static void mainFunction() {
-        String[] args = new String[]{"mgmCC.ini"};
+        String[] args = new String[]{"-ini","zampieronCC"};
         SCIChangeCostCenter.main(args);
     }
 
