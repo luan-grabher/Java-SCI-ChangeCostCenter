@@ -52,16 +52,17 @@ public class SwapModel {
             swaps.forEach((swap) -> {
                 ((Loading) loading.get("loading")).next();
 
-                Map<String, String> usedFilter = new HashMap<>();
+                List<String> usedFilter = new ArrayList<>();
 
                 Map<String, String> sqlSwaps = new HashMap<>();
                 sqlSwaps.put("enterprise", swap.getEnterprise().toString());//Empresa
                 sqlSwaps.put("centerCostPlan", ini.get("Config", "centerCostPlan"));//Plano Centro de Custo
                 sqlSwaps.put("reference", reference);
                 sqlSwaps.put("complement", "");//Plano Centro de Custo
-                sqlSwaps.put("first1","");
+                sqlSwaps.put("first1", "");
 
-                if (swap.getComplementFilter() != null) {//Filtro para o complemento
+                //Filtro para o complemento
+                if (swap.getComplementFilter() != null) {
                     //Cria variavel local
                     StringFilter complementfilter = swap.getComplementFilter();
 
@@ -70,8 +71,8 @@ public class SwapModel {
                             + complementfilter.printMap(complementfilter.getHas(), ", ") + "'";
                     String hasNotFilter = "Complemento de Histórico que NÃO possua os termos: '"
                             + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'";
-                    usedFilter.put(hasFilter, hasFilter);
-                    usedFilter.put(hasNotFilter, hasNotFilter);
+                    usedFilter.add(hasFilter);
+                    usedFilter.add(hasNotFilter);
 
                     //Adicionar no complemento um AND para cada has e um AND para cada hasNot                                  
                     StringBuilder sqlSwap = new StringBuilder();
@@ -83,10 +84,12 @@ public class SwapModel {
                     });
 
                     sqlSwaps.put("complement", sqlSwap.toString());
-                } else if (swap.getAccountCreditOrDebit() != null) {
+                }
+
+                //Filtros de conta
+                if (swap.getAccountCreditOrDebit() != null) {
                     //Mostra filtro usado
-                    String filter = "Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit();
-                    usedFilter.put(filter, filter);
+                    usedFilter.add("Conta de débito ou crédito igual a: " + swap.getAccountCreditOrDebit());
                     //Filtro sql
                     StringBuilder sqlSwap = new StringBuilder();
                     sqlSwap
@@ -98,9 +101,8 @@ public class SwapModel {
 
                     sqlSwaps.put("account", sqlSwap.toString());
                 } else if (swap.getAccountCredit() != null) {
-                    //Mostra filtro usado
-                    String filter = "Conta de crédito igual a: " + swap.getAccountCredit();
-                    usedFilter.put(filter, filter);
+                    //Mostra filtro usado                   
+                    usedFilter.add("Conta de crédito igual a: " + swap.getAccountCredit());
                     //Filtro sql
                     StringBuilder sqlSwap = new StringBuilder();
                     sqlSwap
@@ -110,8 +112,7 @@ public class SwapModel {
                     sqlSwaps.put("account", sqlSwap.toString());
                 } else if (swap.getAccountDebit() != null) {
                     //Mostra filtro usado
-                    String filter = "Conta de débito igual a: " + swap.getAccountDebit();
-                    usedFilter.put(filter, filter);
+                    usedFilter.add("Conta de débito igual a: " + swap.getAccountDebit());
                     //Filtro sql
                     StringBuilder sqlSwap = new StringBuilder();
                     sqlSwap
@@ -120,34 +121,41 @@ public class SwapModel {
 
                     sqlSwaps.put("account", sqlSwap.toString());
                 }
-                
+
                 //Pega somente primeiro se for pra inserir valor ou tiver filtro de valor
-                if(swap.getValue() != null || swap.getValueFilter() != null){
-                    sqlSwaps.put("first1","FIRST 1 ");
+                if (swap.getValue() != null || swap.getValueFilter() != null) {
+                    sqlSwaps.put("first1", "FIRST 1 ");
                 }
 
-                //Cria variavel de lctos
-                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
-
+                /**
+                 * Se tiver filtro de documento irá pesquisar somente pelo
+                 * documento. Talvez algo pare de funcionar nas despesas por nao
+                 * buscar primeiro o fornecedor.
+                 */
                 //Se não encontrar nenhum lcto
-                if (entries.isEmpty() && swap.getComplementFilter() != null && swap.getDocument() != null && swap.getValueFilter() != null) {
+                if (swap.getComplementFilter() != null && swap.getDocument() != null) {
                     //Define o sqlSwap complement para o titulo(documento)
                     sqlSwaps.put("complement", " AND BDCOMPL LIKE '%" + swap.getDocument() + "%' ");
+
+                    //Mostra filtro usado                   
+                    usedFilter.add("Ou complemento de histórico que possua: '" + swap.getDocument() + "'");
+                }
+
+                //Se tiver filtro de valor
+                if (swap.getValueFilter() != null) {
+                    usedFilter.add(" e tenha o valor de " + swap.getValueFilter());
+
                     //Define o sqlSwap value para o valor
                     sqlSwaps.put("value", " AND BDVALOR = " + swap.getValueFilter().toPlainString());
-
-                    //Mostra filtro usado
-                    String filter = "Ou complemento de histórico que possua: '" + swap.getDocument() + "' e tenha o valor de " + swap.getValueFilter();
-                    usedFilter.put(filter, filter);
-
-                    //Procura Lctos
-                    entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
                 }
+
+                //Busca lctos no banco
+                List<Map<String, Object>> entries = Database.getDatabase().getMap(sql_GetContabilityEntries, sqlSwaps);
 
                 //Se existirem lctos na variavel de lctos
                 if (!entries.isEmpty()) {
                     //Se tiver valor para inserir ou filtro de valor
-                    if (entries.size() > 1 && swap.getValue() != null || swap.getValueFilter() != null) {
+                    if (entries.size() > 1 && (swap.getValue() != null || swap.getValueFilter() != null)) {
                         //exclui todos lançamentos menos so primeiro
                         //grava o primeiro
                         Map<String, Object> entry = entries.get(0);
@@ -191,7 +199,7 @@ public class SwapModel {
                     //Se não existirem lctos na variavel de lctos
                     //****Mostra no log que não foi encontrado lctos para aquele filtro
                     log.append("\n\nNenhum lançamento encontrado para a procura: ");
-                    usedFilter.forEach((f, filter) -> {
+                    usedFilter.forEach((filter) -> {
                         log.append("\n").append(filter);
                     });
                 }
@@ -228,7 +236,24 @@ public class SwapModel {
                         .append(cc.get("key"));
 
             } catch (SQLException ex) {
-                throw new Error(ex);
+                //Verifica se o erro é de chave primaria
+                if (ex.getMessage().contains("PRIMARY") && ex.getMessage().contains("UNIQUE")) {
+                    try {
+                        //Se o erro for de chave primaria, tenta adicionar o valor no cc qu existe
+                        Database.getDatabase().query(sql_UpdateCCVal, cc);
+                        
+                        log
+                                .append("\n")
+                                .append("Adicionado valor no centro de custo ")
+                                .append(cc.get("centerCost"))
+                                .append(" na chave ")
+                                .append(cc.get("key"));
+                    } catch (Exception e) {
+                        throw new Error(ex);
+                    }
+                } else {
+                    throw new Error(ex);
+                }
             }
         } else {
             log.append("\n").append("O centro de custo não foi inserido para os parametros porque um deles está nulo: ");
@@ -288,12 +313,12 @@ public class SwapModel {
                     //Para cada chave
                     entries.forEach((entry) -> {
                         ((Loading) loadingEntries.get("loading")).next();
-                        
+
                         Map<String, String> updateSwaps = new HashMap<>();
                         updateSwaps.put("enterprise", swap.getEnterprise().toString());
                         updateSwaps.put("key", entry.get("CHAVE").toString());
-                        updateSwaps.put("difference", entry.get("DIFERENCA").toString());
-                        updateSwaps.put("cc", swap.getCostCenter().toString());
+                        updateSwaps.put("value", entry.get("DIFERENCA").toString());
+                        updateSwaps.put("centerCost", swap.getCostCenter().toString());
 
                         //Atuliza valor no banco de um cc
                         try {
@@ -302,7 +327,7 @@ public class SwapModel {
                             throw new Error(e);
                         }
                     });
-                    
+
                     ((Loading) loadingEntries.get("loading")).dispose();
                 }
             }
