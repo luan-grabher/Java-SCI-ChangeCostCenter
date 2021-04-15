@@ -1,13 +1,15 @@
 package sci.changecostcenter.Model;
 
 import Entity.ErrorIgnore;
+import fileManager.CSV;
 import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import org.ini4j.Profile.Section;
+import java.util.Map;
+import org.ini4j.Ini;
 import sci.changecostcenter.Model.Entity.Swap;
 import static sci.changecostcenter.SCIChangeCostCenter.ini;
 import static sci.changecostcenter.SCIChangeCostCenter.log;
@@ -17,78 +19,56 @@ public class SwapFileModel {
     public static List<Swap> getSwaps(File file) {
         List<Swap> swaps = new ArrayList<>();
 
-        Section cols = (Section) ini.get("Swap File cols");
+        Ini.Section config = (Ini.Section) ini.get("Config");
 
-        if (file.exists() && !FileManager.getText(file).isBlank()) {
+        String enterprise = config.getOrDefault("filtrarValor", "999").toString();
+        Boolean filterValue = Boolean.valueOf((String) config.get("filtrarValor"));
 
-            Integer colEnterprise = Integer.parseInt((String) cols.get("empresa"));
-            Integer colHist = Integer.parseInt((String) cols.get("historico"));
-            Integer colCredit = Integer.parseInt((String) cols.get("credito"));
-            Integer colDebit = Integer.parseInt((String) cols.get("debito"));
-            Integer colCcDebit = Integer.parseInt((String) cols.get("cc debito"));
-            Integer colCcCredit = Integer.parseInt((String) cols.get("cc credito"));
-            Integer colValue = Integer.parseInt((String) cols.get("valor"));
-            Integer colPercent = Integer.parseInt((String) cols.get("porcentagem"));
+        List<Map<String, String>> csvMap = CSV.getMap(file);
+        csvMap.forEach((row) -> {
+            try {
+                //Cria objeto de troca
+                Swap swap = new Swap();
+                swap.setEnterprise(Integer.valueOf(row.getOrDefault("empresa", enterprise)));
+                swap.setCostCenterCredit(getIntOrNull(row.getOrDefault("cc credito", null)));
+                swap.setCostCenterDebit(getIntOrNull(row.getOrDefault("cc debito", null)));
 
-            //Pega linhas do arquivo de texto
-            String[] lines = FileManager.getText(file).split("\r\n");
-
-            //Percorre linhas
-            for (String line : lines) {
-                try {
-                    //Remove espaços
-                    line = line.replaceAll(" ", "");
-
-                    //Se a linha só tiver números continua, se nao é cabeçalho
-                    if (line.matches("[0-9;.,]+")) {
-                        String[] collumns = line.split(";", -1);
-
-                        if (collumns.length == 8) {
-                            //getInteger transforma em branco em null
-                            Integer enterprise = getIntOrNull(collumns[colEnterprise]);
-                            String hist = collumns[colHist].equals("") ? null : collumns[colHist];
-                            Integer credit = getIntOrNull(collumns[colCredit]);
-                            Integer debit = getIntOrNull(collumns[colDebit]);
-                            Integer ccCredit = getIntOrNull(collumns[colCcCredit]);
-                            Integer ccDebit = getIntOrNull(collumns[colCcDebit]);
-                            BigDecimal value = collumns[colValue].equals("") ? null : new BigDecimal(brVal(collumns[colValue]));
-                            BigDecimal percent = collumns[colPercent].equals("") ? null : new BigDecimal(brVal(collumns[colPercent]));
-
-                            //Cria objeto de troca
-                            Swap swap = new Swap();
-                            swap.setEnterprise(enterprise);
-                            swap.setCostCenterCredit(ccCredit);
-                            swap.setCostCenterDebit(ccDebit);
-                            swap.setValue(value);
-                            swap.setPercent(percent);
-
-                            //Se tiver conta nos dois e a conta for igual
-                            if (credit != null && credit.equals(debit)) {
-                                //Define filtro nas duas contas
-                                swap.setAccountCreditOrDebit(ccCredit);
-                            } //Se tiver filtro de conta de credito ou debito
-                            else if (credit != null || debit != null) {
-                                //Define filtro na conta de credito e de debito
-                                swap.setAccountCredit(credit);
-                                swap.setAccountDebit(debit);
-                            }
-
-                            //Se tiver filtro de historico
-                            if (hist != null) {
-                                swap.setComplementFilter(new StringFilter(hist.replaceAll(" ", ";")));
-                            }
-
-                            swaps.add(swap);
-                        } else {
-                            throw new ErrorIgnore("O arquivo de trocas não tem 8 colunas!");
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    log.append("\n Erro (").append(e.getMessage()).append(") na seguinte linha do arquivo de trocas não foi inserida:;").append(line);
+                String valueStr = row.getOrDefault("valor", "");
+                BigDecimal value = "".equals(valueStr) ? null : new BigDecimal(brVal(valueStr));
+                swap.setValue(value);
+                if (filterValue && value != null) {
+                    swap.setValueFilter(value);
                 }
+
+                String percentStr = row.getOrDefault("porcentagem", "");
+                BigDecimal percent = "".equals(percentStr) ? null : new BigDecimal(brVal(percentStr));
+                swap.setPercent(percent);
+
+                Integer credit = getIntOrNull(row.get("credito"));
+                Integer debit = getIntOrNull(row.get("credito"));
+                //Se tiver conta nos dois e a conta for igual
+                if (credit != null && credit.equals(debit)) {
+                    //Define filtro nas duas contas
+                    swap.setAccountCreditOrDebit(credit);
+                } //Se tiver filtro de conta de credito ou debito
+                else if (credit != null || debit != null) {
+                    //Define filtro na conta de credito e de debito
+                    swap.setAccountCredit(credit);
+                    swap.setAccountDebit(debit);
+                }
+
+                //Se tiver filtro de historico
+                String hist = row.getOrDefault("historico", "");
+                if (!"".equals(hist)) {
+                    swap.setComplementFilter(new StringFilter(hist.replaceAll(" ", ";")));
+                }
+
+                swaps.add(swap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.append("\n Erro (").append(e.getMessage()).append(") na seguinte linha do arquivo de trocas não foi inserida:;").append(StringFilter.printMap(row, ";", true));
             }
-        }
+        });
 
         //Verifica se existe algum valor de troca
         if (swaps.isEmpty()) {
