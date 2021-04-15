@@ -43,7 +43,7 @@ public class SCIChangeCostCenter {
 
                 //Start Ini file
                 iniPath = Args.get(args, "ini");
-                iniPath = iniPath == null ? "zampieronCC" : iniPath; //Se não tiver nos argumentos define como .ini
+                iniPath = iniPath == null ? "mgmCC" : iniPath; //Se não tiver nos argumentos define como .ini
                 ini = new Ini(FileManager.getFile(iniPath + ".ini"));
 
                 String monthString = JOptionPane.showInputDialog("Por favor insira o MÊS:");

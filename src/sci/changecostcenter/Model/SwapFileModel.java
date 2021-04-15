@@ -2,7 +2,6 @@ package sci.changecostcenter.Model;
 
 import Entity.ErrorIgnore;
 import fileManager.CSV;
-import fileManager.FileManager;
 import fileManager.StringFilter;
 import java.io.File;
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ public class SwapFileModel {
 
         Ini.Section config = (Ini.Section) ini.get("Config");
 
-        String enterprise = config.getOrDefault("filtrarValor", "999").toString();
+        String enterprise = config.getOrDefault("enterprise", "999").toString();
         Boolean filterValue = Boolean.valueOf((String) config.get("filtrarValor"));
 
         List<Map<String, String>> csvMap = CSV.getMap(file);
