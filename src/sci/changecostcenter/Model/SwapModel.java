@@ -66,22 +66,26 @@ public class SwapModel {
                     //Cria variavel local
                     StringFilter complementfilter = swap.getComplementFilter();
 
-                    //Mostra o filtro usado
-                    String hasFilter = "Complemento de Histórico que possua os termos: '"
-                            + complementfilter.printMap(complementfilter.getHas(), ", ") + "'";
-                    String hasNotFilter = "Complemento de Histórico que NÃO possua os termos: '"
-                            + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'";
-                    usedFilter.add(hasFilter);
-                    usedFilter.add(hasNotFilter);
-
-                    //Adicionar no complemento um AND para cada has e um AND para cada hasNot                                  
+                    //Troca que será feita, unindo has e hasnot
                     StringBuilder sqlSwap = new StringBuilder();
-                    complementfilter.getHas().forEach((h, has) -> {
-                        sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
-                    });
-                    complementfilter.getHasNot().forEach((hn, hasNot) -> {
-                        sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
-                    });
+
+                    if (!complementfilter.getHas().isEmpty()) {
+                        usedFilter.add("Complemento de Histórico que possua os termos: '"
+                                + complementfilter.printMap(complementfilter.getHas(), ", ") + "'");
+
+                        complementfilter.getHas().forEach((h, has) -> {
+                            sqlSwap.append(" AND BDCOMPL LIKE '%").append(has).append("%'");
+                        });
+                    }
+
+                    if (!complementfilter.getHasNot().isEmpty()) {
+                        usedFilter.add("Complemento de Histórico que NÃO possua os termos: '"
+                                + complementfilter.printMap(complementfilter.getHasNot(), ", ") + "'");
+
+                        complementfilter.getHasNot().forEach((hn, hasNot) -> {
+                            sqlSwap.append(" AND BDCOMPL NOT LIKE '%").append(hasNot).append("%'");
+                        });
+                    }
 
                     sqlSwaps.put("complement", sqlSwap.toString());
                 }
@@ -241,7 +245,7 @@ public class SwapModel {
                     try {
                         //Se o erro for de chave primaria, tenta adicionar o valor no cc qu existe
                         Database.getDatabase().query(sql_UpdateCCVal, cc);
-                        
+
                         log
                                 .append("\n")
                                 .append("Adicionado valor no centro de custo ")
